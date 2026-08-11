@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-gedreven LinkedIn Content Pipeline Case Study: Milan Kemp</title>
+<meta name="description" content="Case study: een AI-gedreven B2B content pipeline die LinkedIn-content en blogartikelen genereert vanuit RSS-feeds en performance-data, met human-in-the-loop review.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="grain"></div>
+
+<div class="wrap">
+  <div class="mesh"><div class="b1"></div><div class="b2"></div><div class="b3"></div><div class="b4"></div></div>
+
+  <section class="hero">
+    <a class="back-link reveal" href="../index.html">← Terug naar portfolio</a>
+    <span class="eyebrow reveal">Case study: content pipeline</span>
+    <h1 class="reveal">Van RSS-feed naar <em>publicatieklare LinkedIn-content</em>, met een mens in de loop</h1>
+    <p class="hero-sub reveal">
+      Een AI-gedreven B2B content pipeline voor ReFurnity die LinkedIn-posts en blogartikelen
+      genereert vanuit RSS-feeds en performance-data, met een Lovable-dashboard waarmee het
+      team de pipeline zelfstandig beheert. Er wordt nooit automatisch gepubliceerd.
+    </p>
+    <div class="hero-meta reveal">
+      <div class="meta-item"><strong>6 stappen</strong>bron tot publicatieklaar concept</div>
+      <div class="meta-item"><strong>Human-in-the-loop</strong>geen auto-publicatie</div>
+      <div class="meta-item"><strong>Stack</strong>N8N · Claude API · Lovable</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title observe">De pipeline</div>
+      <div class="section-hint observe">Beweeg over een stap, klik voor details</div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-track"></div>
+      <div class="flow-dot"></div>
+      <div class="stages" id="stages"></div>
+    </div>
+
+    <div class="detail" id="detail">
+      <div class="detail-inner" id="detail-inner">
+        <div>
+          <div class="detail-heading" id="detail-heading">Wat er gebeurt</div>
+          <div class="detail-text" id="detail-text"></div>
+        </div>
+        <div>
+          <div class="detail-heading" style="color:var(--text-faint)"><span style="background:var(--text-faint)"></span>Tech</div>
+          <div class="badges" id="detail-badges"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title observe">De workflow</div>
+      <div class="section-hint observe">N8N-workflow &amp; dashboard: live beeldmateriaal</div>
+    </div>
+
+    <div class="workflow-block">
+      <div class="workflow-shot observe">
+        <img src="../assets/n8n-workflow-linkedin-content.png" alt="Schermafbeelding van de N8N-workflow voor de LinkedIn content pipeline" loading="lazy">
+      </div>
+      <p class="workflow-caption observe">N8N-workflow diagram</p>
+    </div>
+
+    <div class="workflow-block">
+      <div class="workflow-shot observe">
+        <video controls preload="metadata" playsinline>
+          <source src="../assets/linkedin-dashboard-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+      <p class="workflow-caption observe">Dashboard-walkthrough</p>
+    </div>
+  </section>
+
+  <section class="section" style="position:relative;">
+    <div class="mesh" style="top:-60px; opacity:0.45; width:900px; height:420px;"><div class="b2" style="right:auto; left:10%;"></div><div class="b3" style="left:auto; right:10%; top:60px;"></div></div>
+    <div class="section-head"><div class="section-title observe">Belangrijkste les</div></div>
+    <div class="lesson observe">
+      <div class="lesson-icon">◆</div>
+      <div>
+        <h3>Automatiseer het denkwerk, niet de publish-knop</h3>
+        <p>
+          De pipeline versnelt research, structuur en een eerste concept: het werk dat de meeste
+          tijd kost. Publicatie blijft bewust een handmatige stap: merkstem, toon en timing op
+          LinkedIn zijn te gevoelig om zonder review de deur uit te laten gaan. Het
+          Lovable-dashboard is daarom niet alleen een preview, maar de plek waar het team elk
+          concept goedkeurt, bijschaaft of afwijst voordat het verder gaat.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-bottom: 40px;">
+    <div class="section-head">
+      <div class="section-title observe">Output</div>
+      <div class="section-hint observe">Twee contentvormen, één feedback-loop</div>
+    </div>
+    <div class="outputs">
+      <div class="output-card lift-card observe">
+        <span class="tag">01</span><h4>LinkedIn-post</h4>
+        <p>Kant-en-klaar conceptbericht in ReFurnity's tone-of-voice, klaar voor review in het dashboard.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">02</span><h4>Blogartikel</h4>
+        <p>Langere vorm content vanuit dezelfde RSS-bron, weggeschreven naar Google Docs voor redactie.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">03</span><h4>Performance-loop</h4>
+        <p>Resultaten van gepubliceerde content vloeien terug in Sheets en verbeteren de volgende generatie-ronde.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <div class="footer-name">Milan Kemp</div>
+      <div class="footer-role">Automation &amp; AI development</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="../index.html">← Portfolio</a>
+    </div>
+  </footer>
+
+</div>
+
+<script src="../js/springs.js"></script>
+<script src="../js/pipeline.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  revealStagger([...document.querySelectorAll('.hero .reveal')], 80, 70);
+  observeReveal('.observe');
+  document.querySelectorAll('.footer-link, .back-link').forEach(el => attachPressFeedback(el));
+  document.querySelectorAll('.lift-card').forEach(el => {
+    attachMagneticTilt(el, { maxTilt: 6, lift: -2, hoverScale: 1.02, downScale: 0.985 });
+  });
+
+  const stagesData = [
+    { title: "Monitoring", sub: "RSS-feeds", heading: "Input",
+      text: "Een N8N-workflow houdt relevante RSS-feeds continu in de gaten en verzamelt nieuwe artikelen als bronmateriaal voor content.",
+      badges: ["N8N", "RSS"] },
+    { title: "Performance", sub: "Google Sheets", heading: "Context",
+      text: "Bereik- en engagementcijfers van eerder gepubliceerde posts worden bijgehouden in Sheets en dienen als input: wat werkte al goed bij deze doelgroep?",
+      badges: ["Google Sheets"] },
+    { title: "AI-generatie", sub: "Claude API", heading: "Content-generatie",
+      text: "Claude API combineert de RSS-input met performance-inzichten en schrijft LinkedIn-posts en blogartikelen in ReFurnity's tone-of-voice.",
+      badges: ["Claude API"] },
+    { title: "Review", sub: "Lovable dashboard", heading: "Human-in-the-loop",
+      text: "Het team bekijkt elk gegenereerd concept in het Lovable-dashboard, bewerkt waar nodig en keurt goed: niets gaat door zonder menselijke controle.",
+      badges: ["Lovable", "Human-in-the-loop"] },
+    { title: "Opmaak", sub: "Google Docs", heading: "Redactie",
+      text: "Goedgekeurde blogartikelen worden weggeschreven naar Google Docs, waar verdere redactie en opmaak plaatsvindt voor publicatie.",
+      badges: ["Google Docs"] },
+    { title: "Publicatie", sub: "Handmatig door team", heading: "Publiceren",
+      text: "Na finale controle plaatst het team de content zelf op LinkedIn.",
+      badges: ["Handmatige publicatie"] }
+  ];
+
+  initPipeline(stagesData, { openIndex: 0 });
+});
+</script>
+
+</body>
+</html>

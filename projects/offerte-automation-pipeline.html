@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offerte Automation Case Study: Milan Kemp</title>
+<meta name="description" content="Case study: een productie-pipeline die leveranciersdocumenten automatisch omzet naar branded offertes, orderbevestigingen en facturen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="grain"></div>
+
+<div class="wrap">
+  <div class="mesh"><div class="b1"></div><div class="b2"></div><div class="b3"></div><div class="b4"></div></div>
+
+  <section class="hero">
+    <a class="back-link reveal" href="../index.html">← Terug naar portfolio</a>
+    <span class="eyebrow reveal">Case study: automation pipeline</span>
+    <h1 class="reveal">Van leveranciers&shy;document naar <em>branded offerte</em>, zonder handwerk</h1>
+    <p class="hero-sub reveal">
+      Een productie-pipeline die prijsopgaves van leveranciers automatisch verwerkt tot
+      professionele offertes, orderbevestigingen en facturen, gebouwd voor ReFurnity,
+      een B2B circulair interieurmanagementbedrijf.
+    </p>
+    <div class="hero-meta reveal">
+      <div class="meta-item"><strong>6 stappen</strong>upload tot output</div>
+      <div class="meta-item"><strong>3 documenttypes</strong>offerte · orderbevestiging · factuur</div>
+      <div class="meta-item"><strong>Stack</strong>Lovable · N8N · FastAPI · Claude API</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title observe">De pipeline</div>
+      <div class="section-hint observe">Beweeg over een stap, klik voor details</div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-track"></div>
+      <div class="flow-dot"></div>
+      <div class="stages" id="stages"></div>
+    </div>
+
+    <div class="detail" id="detail">
+      <div class="detail-inner" id="detail-inner">
+        <div>
+          <div class="detail-heading" id="detail-heading">Wat er gebeurt</div>
+          <div class="detail-text" id="detail-text"></div>
+        </div>
+        <div>
+          <div class="detail-heading" style="color:var(--text-faint)"><span style="background:var(--text-faint)"></span>Tech</div>
+          <div class="badges" id="detail-badges"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title observe">De workflow</div>
+      <div class="section-hint observe">N8N-workflow &amp; dashboard: live beeldmateriaal</div>
+    </div>
+
+    <div class="workflow-block">
+      <div class="workflow-shot observe">
+        <img src="../assets/n8n-workflow-offerte.png" alt="Schermafbeelding van de N8N-workflow voor de offerte automation pipeline" loading="lazy">
+      </div>
+      <p class="workflow-caption observe">N8N-workflow diagram</p>
+    </div>
+
+    <div class="workflow-block">
+      <div class="workflow-shot observe">
+        <video controls preload="metadata" playsinline>
+          <source src="../assets/offerte-dashboard-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+      <p class="workflow-caption observe">Dashboard-walkthrough</p>
+    </div>
+  </section>
+
+  <section class="section" style="position:relative;">
+    <div class="mesh" style="top:-60px; opacity:0.45; width:900px; height:420px;"><div class="b2" style="right:auto; left:10%;"></div><div class="b3" style="left:auto; right:10%; top:60px;"></div></div>
+    <div class="section-head"><div class="section-title observe">Belangrijkste les</div></div>
+    <div class="lesson observe">
+      <div class="lesson-icon">◆</div>
+      <div>
+        <h3>Bijna elke bug was een field-name mismatch</h3>
+        <p>
+          Data stroomt door drie systemen die onafhankelijk zijn ontwikkeld (Lovable, N8N en de
+          Python-service), en die moeten het exact eens zijn over veldnamen. Vrijwel iedere bug
+          tijdens de bouw kwam hieruit voort. Het herhaalbare fix-patroon: eerst de exacte JSON
+          bekijken in <code>N8N's Input tab</code>, dan pas verder debuggen.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-bottom: 40px;">
+    <div class="section-head">
+      <div class="section-title observe">Output</div>
+      <div class="section-hint observe">Drie documenttypes, één huisstijl</div>
+    </div>
+    <div class="outputs">
+      <div class="output-card lift-card observe">
+        <span class="tag">01</span><h4>Offerte</h4>
+        <p>Regelitems, korting/toeslag verwerkt in eindtotaal, ReFurnity-branding, export naar Word/PDF/Excel.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">02</span><h4>Orderbevestiging</h4>
+        <p>Zelfde datamodel, ander document: genereert direct vanuit een geaccepteerde offerte.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">03</span><h4>Factuur</h4>
+        <p>Sluit de flow af, met dezelfde velden en validatie als de eerdere twee documenten.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <div class="footer-name">Milan Kemp</div>
+      <div class="footer-role">Automation &amp; AI development</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="../index.html">← Portfolio</a>
+      <a class="footer-link" href="https://github.com/Milan-Kemp/Offerte-generator" target="_blank" rel="noopener">github.com/Milan-Kemp/Offerte-generator</a>
+    </div>
+  </footer>
+
+</div>
+
+<script src="../js/springs.js"></script>
+<script src="../js/pipeline.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  revealStagger([...document.querySelectorAll('.hero .reveal')], 80, 70);
+  observeReveal('.observe');
+  document.querySelectorAll('.footer-link, .back-link').forEach(el => attachPressFeedback(el));
+  document.querySelectorAll('.lift-card').forEach(el => {
+    attachMagneticTilt(el, { maxTilt: 6, lift: -2, hoverScale: 1.02, downScale: 0.985 });
+  });
+
+  const stagesData = [
+    { title: "Upload", sub: "Leveranciersdocument", heading: "Input",
+      text: "Eén of meerdere leveranciersdocumenten (PDF, Word, Excel) worden geüpload. Foto's die bij het document horen worden genormaliseerd zodat ze consistent ogen in de output.",
+      badges: ["Multi-file upload", "PIL image normalization"] },
+    { title: "Extractie", sub: "Claude API", heading: "AI-extractie",
+      text: "Claude API leest het brondocument en zet regelitems, prijzen en specificaties om naar gestructureerde data. Validators vangen edge cases op, zoals lege velden die anders de rest van de pipeline zouden breken.",
+      badges: ["Claude API", "Pydantic validators"] },
+    { title: "Review", sub: "Lovable dashboard", heading: "Bewerken",
+      text: "De geëxtraheerde data is direct te controleren en aan te passen in een dashboard, inclusief korting- en toeslagpercentages per regel of over het totaal.",
+      badges: ["Lovable", "Live editing"] },
+    { title: "Orkestratie", sub: "N8N workflow", heading: "Workflow-engine",
+      text: "Een lokale N8N-workflow verbindt alle stappen en stuurt data door naar de generatie-service, beveiligd met een API-key op de webhook.",
+      badges: ["N8N", "Webhook + API-key", "ngrok tunnel"] },
+    { title: "Generatie", sub: "FastAPI op Render", heading: "Documentgeneratie",
+      text: "Claude Code bouwde een Python/FastAPI-microservice die de data omzet in het uiteindelijke document, met ReFurnity-huisstijl. Ik bepaalde de architectuur en API-contracten, Claude Code implementeerde de service.",
+      badges: ["Python", "FastAPI", "Render", "Warmup ping"] },
+    { title: "Output", sub: "Word / PDF / Excel", heading: "Archief",
+      text: "Het eindresultaat wordt gegenereerd in het gewenste formaat en opgeslagen in een geschiedenis-overzicht, gegroepeerd per klant zodat eerdere offertes terug te vinden zijn.",
+      badges: ["python-docx", "Geschiedenis-pagina"] }
+  ];
+
+  initPipeline(stagesData, { openIndex: 0 });
+});
+</script>
+
+</body>
+</html>
