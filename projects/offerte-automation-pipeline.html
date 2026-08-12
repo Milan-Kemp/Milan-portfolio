@@ -47,6 +47,44 @@
       <div class="section-hint observe">Beweeg over een stap, klik voor details</div>
     </div>
 
+    <div class="arch-diagram observe">
+      <svg class="arch-svg" viewBox="0 0 1000 34" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="archGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" style="stop-color: var(--accent);" />
+            <stop offset="100%" style="stop-color: var(--accent2);" />
+          </linearGradient>
+          <marker id="archArrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+            <path d="M0,0 L9,4.5 L0,9 Z" style="fill: var(--accent2);" />
+          </marker>
+        </defs>
+        <path id="archPath" d="M 60 17 L 930 17" fill="none" style="stroke: url(#archGrad);" stroke-width="2.5" stroke-linecap="round" marker-end="url(#archArrow)" />
+        <circle id="archPulse" cx="60" cy="17" r="5" style="fill: var(--accent); filter: drop-shadow(0 0 4px rgba(65,194,29,0.7));" />
+      </svg>
+      <div class="arch-nodes">
+        <button class="arch-node" type="button" data-stage="2" aria-label="Lovable — bekijk details">
+          <span class="arch-node-icon">◆</span>
+          <span class="arch-node-name">Lovable</span>
+          <span class="arch-node-role">dashboard</span>
+        </button>
+        <button class="arch-node" type="button" data-stage="3" aria-label="N8N — bekijk details">
+          <span class="arch-node-icon">◆</span>
+          <span class="arch-node-name">N8N</span>
+          <span class="arch-node-role">workflow</span>
+        </button>
+        <button class="arch-node" type="button" data-stage="1" aria-label="Claude API — bekijk details">
+          <span class="arch-node-icon">◆</span>
+          <span class="arch-node-name">Claude API</span>
+          <span class="arch-node-role">extractie</span>
+        </button>
+        <button class="arch-node" type="button" data-stage="4" aria-label="FastAPI / Render — bekijk details">
+          <span class="arch-node-icon">◆</span>
+          <span class="arch-node-name">FastAPI / Render</span>
+          <span class="arch-node-role">documentgeneratie</span>
+        </button>
+      </div>
+    </div>
+
     <div class="pipeline">
       <div class="pipeline-track"></div>
       <div class="flow-dot"></div>
