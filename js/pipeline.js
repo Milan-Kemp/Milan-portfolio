@@ -7,12 +7,12 @@
    blur + scale + opacity) directly under that card and pushes the rest of
    the list down.
 
-   Desktop (>780px): if the page provides a .diagram-wrap (currently only
-   the offerte case study), the stage grid is replaced entirely by a small
-   architecture diagram — a handful of nodes connected by a self-drawing
-   SVG line — and node clicks drive the single shared #detail panel below
-   it. Pages without .diagram-wrap keep the original 6-card grid + shared
-   panel on desktop, unchanged (the LinkedIn case study).
+   Desktop (>780px): if the page provides a .canvas (currently only the
+   offerte case study), the stage grid is replaced entirely by an N8N-style
+   canvas diagram — a handful of nodes connected by self-drawing bezier
+   curves — and node clicks drive the single shared #detail panel below it.
+   Pages without .canvas keep the original 6-card grid + shared panel on
+   desktop, unchanged (the LinkedIn case study).
    ========================================================================== */
 
 function initPipeline(stagesData, { openIndex = 0, diagramData = null } = {}) {
@@ -24,7 +24,7 @@ function initPipeline(stagesData, { openIndex = 0, diagramData = null } = {}) {
   const badgesEl = document.getElementById('detail-badges');
 
   const mobileQuery = window.matchMedia('(max-width: 780px)');
-  const hasDiagram = !!document.querySelector('.diagram-wrap');
+  const hasDiagram = !!document.querySelector('.canvas');
   const stageEls = [];
 
   function onStageClick(i) {
@@ -122,7 +122,7 @@ function initPipeline(stagesData, { openIndex = 0, diagramData = null } = {}) {
     mobileActiveIndex = null;
     activeIndex = null;
     panelSpring.jumpTo(0);
-    document.querySelectorAll('.diagram-node').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
   });
 
   /* ---------- Shared #detail panel ---------- */
@@ -199,71 +199,90 @@ function initPipeline(stagesData, { openIndex = 0, diagramData = null } = {}) {
   }
 
   (function initDiagram() {
-    const wrap = document.querySelector('.diagram-wrap');
+    const wrap = document.querySelector('.canvas');
     if (!wrap || !diagramData) return;
 
-    const nodes = Array.from(wrap.querySelectorAll('.diagram-node'));
+    const svg = wrap.querySelector('.canvas-svg');
+    const nodes = Array.from(wrap.querySelectorAll('.node'));
     nodes.forEach((node, i) => {
       attachMagneticTilt(node, { maxTilt: 6, lift: -2, hoverScale: 1.02, downScale: 0.97 });
       node.addEventListener('click', () => openDiagramNode(node, diagramData[i]));
     });
 
-    const paths = Array.from(wrap.querySelectorAll('.diagram-path'));
-    const pulse = wrap.querySelector('.diagram-pulse');
+    // Connector paths can't be hardcoded: .canvas-svg spans the canvas's
+    // padding-box (absolute, width:100%) while .nodes-row spans its
+    // content-box (normal flow), so a fixed viewBox never lines up with
+    // real port positions. Instead measure ports live and draw straight
+    // into the SVG's own pixel space every time layout can change.
+    let drawn = false;
+    let drawSprings = [];
 
-    if (paths.length) {
-      const lengths = paths.map(p => p.getTotalLength());
-      paths.forEach((p, i) => {
-        p.style.strokeDasharray = String(lengths[i]);
-        p.style.strokeDashoffset = String(lengths[i]);
-      });
+    function buildConnectors() {
+      svg.querySelectorAll('.conn').forEach(p => p.remove());
+      if (mobileQuery.matches) return [];
+      const svgRect = svg.getBoundingClientRect();
+      if (!svgRect.width || !svgRect.height) return [];
+      svg.setAttribute('viewBox', `0 0 ${svgRect.width} ${svgRect.height}`);
 
-      let pendingSprings = 0;
-      const drawSprings = paths.map((p, i) => new Spring({
-        value: 0, response: 0.65, damping: 1,
-        onUpdate: v => { p.style.strokeDashoffset = String(lengths[i] * (1 - Math.max(0, Math.min(1, v)))); },
-        onSettle: () => { pendingSprings--; if (pendingSprings <= 0) runPulseOnce(); }
-      }));
-
-      function runPulseOnce() {
-        if (REDUCED_MOTION || !pulse) return;
-        const totalLen = lengths.reduce((a, b) => a + b, 0);
-        const duration = 1300;
-        let start = null;
-        pulse.style.opacity = '1';
-        function frame(t) {
-          if (!start) start = t;
-          const elapsed = t - start;
-          const progressLen = Math.min(elapsed / duration, 1) * totalLen;
-          let acc = 0, segIndex = 0, localLen = 0;
-          for (let i = 0; i < lengths.length; i++) {
-            const segEnd = acc + lengths[i];
-            if (progressLen <= segEnd || i === lengths.length - 1) {
-              segIndex = i;
-              localLen = Math.max(0, Math.min(progressLen - acc, lengths[i]));
-              break;
-            }
-            acc = segEnd;
-          }
-          const pt = paths[segIndex].getPointAtLength(localLen);
-          pulse.setAttribute('cx', pt.x);
-          pulse.setAttribute('cy', pt.y);
-          if (elapsed < duration) requestAnimationFrame(frame);
-          else pulse.style.opacity = '0';
-        }
-        requestAnimationFrame(frame);
+      const paths = [];
+      for (let i = 0; i < nodes.length - 1; i++) {
+        const outPort = nodes[i].querySelector('.port-out');
+        const inPort = nodes[i + 1].querySelector('.port-in');
+        if (!outPort || !inPort) continue;
+        const r1 = outPort.getBoundingClientRect();
+        const r2 = inPort.getBoundingClientRect();
+        const x1 = r1.left + r1.width / 2 - svgRect.left;
+        const y1 = r1.top + r1.height / 2 - svgRect.top;
+        const x2 = r2.left + r2.width / 2 - svgRect.left;
+        const y2 = r2.top + r2.height / 2 - svgRect.top;
+        const midX = (x1 + x2) / 2;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('class', 'conn');
+        path.setAttribute('d', `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`);
+        svg.appendChild(path);
+        paths.push(path);
       }
-
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          pendingSprings = drawSprings.length;
-          drawSprings.forEach((s, i) => setTimeout(() => s.setTarget(1), i * 140));
-          io.unobserve(entry.target);
-        });
-      }, { threshold: 0.35 });
-      io.observe(wrap);
+      return paths;
     }
+
+    function layout() {
+      const paths = buildConnectors();
+      drawSprings = paths.map(path => {
+        const len = path.getTotalLength();
+        if (drawn) {
+          path.style.strokeDasharray = 'none';
+          path.style.strokeDashoffset = '0';
+        } else {
+          path.style.strokeDasharray = String(len);
+          path.style.strokeDashoffset = String(len);
+        }
+        return {
+          path, len,
+          spring: new Spring({
+            value: drawn ? 1 : 0, response: 0.65, damping: 1,
+            onUpdate: v => { path.style.strokeDashoffset = String(len * (1 - Math.max(0, Math.min(1, v)))); }
+          })
+        };
+      });
+    }
+
+    layout();
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      if (mobileQuery.matches) return;
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(layout, 120);
+    });
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        drawn = true;
+        drawSprings.forEach((s, i) => setTimeout(() => s.spring.setTarget(1), i * 140));
+        io.unobserve(entry.target);
+      });
+    }, { threshold: 0.35 });
+    io.observe(wrap);
 
     if (nodes.length) openDiagramNode(nodes[0], diagramData[0]);
   })();
