@@ -9,10 +9,10 @@
 
    Desktop (>780px): if the page provides a .canvas (currently only the
    offerte case study), the stage grid is replaced entirely by an N8N-style
-   canvas diagram — a handful of nodes connected by self-drawing bezier
-   curves — and node clicks drive the single shared #detail panel below it.
-   Pages without .canvas keep the original 6-card grid + shared panel on
-   desktop, unchanged (the LinkedIn case study).
+   canvas diagram — a handful of nodes connected by bezier curves with an
+   ambient traveling pulse — and node clicks drive the single shared
+   #detail panel below it. Pages without .canvas keep the original 6-card
+   grid + shared panel on desktop, unchanged (the LinkedIn case study).
    ========================================================================== */
 
 function initPipeline(stagesData, { openIndex = 0, diagramData = null } = {}) {
@@ -190,7 +190,7 @@ function initPipeline(stagesData, { openIndex = 0, diagramData = null } = {}) {
 
   function openDiagramNode(node, data) {
     const isSame = diagramActiveNode === node;
-    document.querySelectorAll('.diagram-node').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
     if (isSame) { panelSpring.setTarget(0); diagramActiveNode = null; return; }
     const wasOpen = diagramActiveNode !== null;
     diagramActiveNode = node;
@@ -213,18 +213,19 @@ function initPipeline(stagesData, { openIndex = 0, diagramData = null } = {}) {
     // padding-box (absolute, width:100%) while .nodes-row spans its
     // content-box (normal flow), so a fixed viewBox never lines up with
     // real port positions. Instead measure ports live and draw straight
-    // into the SVG's own pixel space every time layout can change.
-    let drawn = false;
-    let drawSprings = [];
+    // into the SVG's own pixel space every time layout can change. Lines
+    // are always visible (no reveal animation to fail); an ambient dot
+    // travels each path continuously via native SMIL animateMotion, which
+    // keeps running on its own without any JS timer/observer to babysit.
+    const svgNS = 'http://www.w3.org/2000/svg';
 
     function buildConnectors() {
-      svg.querySelectorAll('.conn').forEach(p => p.remove());
-      if (mobileQuery.matches) return [];
+      svg.querySelectorAll('.conn, .conn-pulse').forEach(el => el.remove());
+      if (mobileQuery.matches) return;
       const svgRect = svg.getBoundingClientRect();
-      if (!svgRect.width || !svgRect.height) return [];
+      if (!svgRect.width || !svgRect.height) return;
       svg.setAttribute('viewBox', `0 0 ${svgRect.width} ${svgRect.height}`);
 
-      const paths = [];
       for (let i = 0; i < nodes.length - 1; i++) {
         const outPort = nodes[i].querySelector('.port-out');
         const inPort = nodes[i + 1].querySelector('.port-in');
@@ -236,53 +237,35 @@ function initPipeline(stagesData, { openIndex = 0, diagramData = null } = {}) {
         const x2 = r2.left + r2.width / 2 - svgRect.left;
         const y2 = r2.top + r2.height / 2 - svgRect.top;
         const midX = (x1 + x2) / 2;
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const d = `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
+
+        const path = document.createElementNS(svgNS, 'path');
         path.setAttribute('class', 'conn');
-        path.setAttribute('d', `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`);
+        path.setAttribute('d', d);
         svg.appendChild(path);
-        paths.push(path);
-      }
-      return paths;
-    }
 
-    function layout() {
-      const paths = buildConnectors();
-      drawSprings = paths.map(path => {
-        const len = path.getTotalLength();
-        if (drawn) {
-          path.style.strokeDasharray = 'none';
-          path.style.strokeDashoffset = '0';
-        } else {
-          path.style.strokeDasharray = String(len);
-          path.style.strokeDashoffset = String(len);
+        if (!REDUCED_MOTION) {
+          const pulse = document.createElementNS(svgNS, 'circle');
+          pulse.setAttribute('class', 'conn-pulse');
+          pulse.setAttribute('r', '3.5');
+          const motion = document.createElementNS(svgNS, 'animateMotion');
+          motion.setAttribute('dur', '2.6s');
+          motion.setAttribute('repeatCount', 'indefinite');
+          motion.setAttribute('begin', `${i * -0.55}s`);
+          motion.setAttribute('path', d);
+          pulse.appendChild(motion);
+          svg.appendChild(pulse);
         }
-        return {
-          path, len,
-          spring: new Spring({
-            value: drawn ? 1 : 0, response: 0.65, damping: 1,
-            onUpdate: v => { path.style.strokeDashoffset = String(len * (1 - Math.max(0, Math.min(1, v)))); }
-          })
-        };
-      });
+      }
     }
 
-    layout();
+    buildConnectors();
     let resizeTimer = null;
     window.addEventListener('resize', () => {
       if (mobileQuery.matches) return;
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(layout, 120);
+      resizeTimer = setTimeout(buildConnectors, 120);
     });
-
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        drawn = true;
-        drawSprings.forEach((s, i) => setTimeout(() => s.spring.setTarget(1), i * 140));
-        io.unobserve(entry.target);
-      });
-    }, { threshold: 0.35 });
-    io.observe(wrap);
 
     if (nodes.length) openDiagramNode(nodes[0], diagramData[0]);
   })();
