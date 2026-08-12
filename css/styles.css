@@ -672,4 +672,14 @@ footer {
   text-decoration: none; margin-bottom: 28px; will-change: transform;
 }
 
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 640px) {
+  .wrap { padding: 0 20px; }
+  .section { padding: 56px 0; }
+  .hero { padding: 90px 0 60px; }
+  .project-card { padding: 24px; }
+  .project-card-cta { top: 20px; right: 20px; width: 34px; height: 34px; }
+}
+
 .back-link.is-hover { color: var(--accent-text); }

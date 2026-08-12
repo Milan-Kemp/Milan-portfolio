@@ -135,8 +135,16 @@ function attachMagneticTilt(el, { maxTilt = 9, lift = -3, hoverScale = 1.02, dow
   const scaleSpring = new Spring({ value: 1, response: 0.3, damping: 1.0, onUpdate: v => { scale = v; apply(); } });
   const tySpring = new Spring({ value: 0, response: 0.3, damping: 1.0, onUpdate: v => { ty = v; apply(); } });
 
+  // Touch has no hover state — a finger lifting isn't "still pointing at"
+  // the card the way a mouse cursor is. reset() puts everything back to
+  // rest instead of the mouse-only "hovering" state, so a tap never leaves
+  // the card mid-tilt/mid-lift with no further event to un-stick it.
+  const reset = () => {
+    rxSpring.setTarget(0); rySpring.setTarget(0); scaleSpring.setTarget(1); tySpring.setTarget(0);
+  };
+
   el.addEventListener('pointermove', (e) => {
-    if (REDUCED_MOTION) return;
+    if (REDUCED_MOTION || e.pointerType === 'touch') return;
     const r = el.getBoundingClientRect();
     const relX = (e.clientX - r.left) / r.width - 0.5;
     const relY = (e.clientY - r.top) / r.height - 0.5;
@@ -145,20 +153,23 @@ function attachMagneticTilt(el, { maxTilt = 9, lift = -3, hoverScale = 1.02, dow
     scaleSpring.setTarget(hoverScale);
     tySpring.setTarget(lift);
   });
-  el.addEventListener('pointerleave', () => {
-    rxSpring.setTarget(0); rySpring.setTarget(0); scaleSpring.setTarget(1); tySpring.setTarget(0);
-  });
+  el.addEventListener('pointerleave', reset);
+  el.addEventListener('pointercancel', reset);
   el.addEventListener('pointerdown', () => { scaleSpring.setTarget(downScale); });
-  el.addEventListener('pointerup', () => { scaleSpring.setTarget(REDUCED_MOTION ? 1 : hoverScale); });
+  el.addEventListener('pointerup', (e) => {
+    if (e.pointerType === 'touch') { reset(); }
+    else { scaleSpring.setTarget(REDUCED_MOTION ? 1 : hoverScale); }
+  });
 }
 
 /* Simple press feedback for buttons/links — instant on pointerdown */
 function attachPressFeedback(el, { downScale = 0.96, hoverClass = 'is-hover' } = {}) {
   const spring = new Spring({ value: 1, response: 0.28, damping: 0.9, onUpdate: v => { el.style.transform = `scale(${v})`; } });
-  el.addEventListener('pointerenter', () => el.classList.add(hoverClass));
+  el.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'touch') el.classList.add(hoverClass); });
   el.addEventListener('pointerleave', () => { el.classList.remove(hoverClass); spring.setTarget(1); });
+  el.addEventListener('pointercancel', () => { el.classList.remove(hoverClass); spring.setTarget(1); });
   el.addEventListener('pointerdown', () => spring.setTarget(downScale));
-  el.addEventListener('pointerup', () => spring.setTarget(1));
+  el.addEventListener('pointerup', (e) => { if (e.pointerType === 'touch') el.classList.remove(hoverClass); spring.setTarget(1); });
 }
 
 /* Cursor-following radial glow behind a card — position and fade are both
@@ -173,12 +184,14 @@ function attachHoverSpotlight(el, { radius = 260, color = 'rgba(65,194,29,0.16)'
   const oSpring = new Spring({ value: 0, response: 0.35, damping: 1.0, onUpdate: v => el.style.setProperty('--spot-o', v) });
 
   el.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch') return;
     const r = el.getBoundingClientRect();
     xSpring.setTarget(((e.clientX - r.left) / r.width) * 100);
     ySpring.setTarget(((e.clientY - r.top) / r.height) * 100);
     oSpring.setTarget(1);
   });
   el.addEventListener('pointerleave', () => oSpring.setTarget(0));
+  el.addEventListener('pointercancel', () => oSpring.setTarget(0));
 }
 
 /* Spring count-up for a number, e.g. hero stats — settles exactly on the
@@ -198,8 +211,9 @@ function animateCount(el) {
    of overshoot (damping < 1), instant scale-down on pointerdown. */
 function attachBadgePop(el, { hoverScale = 1.08, downScale = 0.94 } = {}) {
   const spring = new Spring({ value: 1, response: 0.28, damping: 0.75, onUpdate: v => { el.style.transform = `scale(${v})`; } });
-  el.addEventListener('pointerenter', () => spring.setTarget(hoverScale));
+  el.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'touch') spring.setTarget(hoverScale); });
   el.addEventListener('pointerleave', () => spring.setTarget(1));
+  el.addEventListener('pointercancel', () => spring.setTarget(1));
   el.addEventListener('pointerdown', () => spring.setTarget(downScale));
-  el.addEventListener('pointerup', () => spring.setTarget(hoverScale));
+  el.addEventListener('pointerup', (e) => { spring.setTarget(e.pointerType === 'touch' ? 1 : hoverScale); });
 }
