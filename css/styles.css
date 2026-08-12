@@ -70,12 +70,27 @@ img { max-width: 100%; display: block; }
   position: absolute;
   top: -260px; left: 50%;
   width: 1500px; height: 900px;
+  overflow: hidden;
   transform: translateX(-50%);
   z-index: 0;
   pointer-events: none;
   filter: blur(64px);
   opacity: 0.82;
   will-change: transform;
+}
+
+/* The mesh blobs use fixed px widths (1500/1100/1000, incl. inline-styled
+   instances) so they read as soft ambient shapes rather than edge-to-edge
+   bars. That's fine while the viewport is wider than the blob — but below
+   ~1024px the centered, absolutely-positioned box starts extending past
+   both edges of the page, inflating body.scrollWidth and causing real
+   horizontal overflow (confirmed: at 1024px the hero mesh alone accounted
+   for the full 246px of page overflow). max-width doesn't lose to an
+   inline width= declaration (they're different properties), so this caps
+   every .mesh instance — including the two with inline widths — without
+   touching anything above 1024px, where max-width never applies. */
+@media (max-width: 1024px) {
+  .mesh { max-width: 100%; }
 }
 
 .mesh div { position: absolute; border-radius: 50%; }
