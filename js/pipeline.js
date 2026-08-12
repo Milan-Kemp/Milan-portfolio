@@ -1,17 +1,21 @@
 /* ==========================================================================
    Milan Kemp — Portfolio: case-study pipeline renderer
-   Shared by every page under /projects/. Renders the stage grid from a data
-   array and drives the detail panel with a materialize animation
-   (blur + scale + opacity together, not just a fade).
+   Shared by every page under /projects/.
 
-   Desktop (>780px): one shared #detail panel below the stage row.
-   Mobile (<=780px): each stage is its own accordion — a single panel glued
-   to the bottom of a 6-item list reads as "attached to the wrong card" once
-   you've scrolled past card 1, so the detail content opens directly under
-   the tapped card instead and pushes the rest of the list down.
+   Mobile (<=780px): the stage grid renders and each card is its own
+   accordion — tapping opens the detail content (same materialize spring:
+   blur + scale + opacity) directly under that card and pushes the rest of
+   the list down.
+
+   Desktop (>780px): if the page provides a .diagram-wrap (currently only
+   the offerte case study), the stage grid is replaced entirely by a small
+   architecture diagram — a handful of nodes connected by a self-drawing
+   SVG line — and node clicks drive the single shared #detail panel below
+   it. Pages without .diagram-wrap keep the original 6-card grid + shared
+   panel on desktop, unchanged (the LinkedIn case study).
    ========================================================================== */
 
-function initPipeline(stagesData, { openIndex = 0 } = {}) {
+function initPipeline(stagesData, { openIndex = 0, diagramData = null } = {}) {
   const stagesEl = document.getElementById('stages');
   const detailEl = document.getElementById('detail');
   const detailInner = document.getElementById('detail-inner');
@@ -20,13 +24,14 @@ function initPipeline(stagesData, { openIndex = 0 } = {}) {
   const badgesEl = document.getElementById('detail-badges');
 
   const mobileQuery = window.matchMedia('(max-width: 780px)');
-
-  let activeIndex = null;       // desktop shared-panel state
-  let mobileActiveIndex = null; // mobile accordion state
-  let mobilePanel = null;
-  let mobileSpring = null;
-
+  const hasDiagram = !!document.querySelector('.diagram-wrap');
   const stageEls = [];
+
+  function onStageClick(i) {
+    if (mobileQuery.matches) toggleMobileStage(i);
+    else if (!hasDiagram) toggleStageDesktop(i);
+    // desktop + hasDiagram: the grid is display:none (CSS), unreachable.
+  }
 
   stagesData.forEach((stage, i) => {
     const el = document.createElement('div');
@@ -37,64 +42,16 @@ function initPipeline(stagesData, { openIndex = 0 } = {}) {
       <div class="stage-sub">${stage.sub}</div>
     `;
     attachMagneticTilt(el, { maxTilt: 9, lift: -3, hoverScale: 1.02, downScale: 0.97 });
-    el.addEventListener('click', () => toggleStage(i));
+    el.addEventListener('click', () => onStageClick(i));
     stagesEl.appendChild(el);
     stageEls.push(el);
   });
 
-  /* ---------- Desktop: shared panel ---------- */
-
-  const panelSpring = new Spring({
-    value: 0, response: 0.36, damping: 0.86,
-    onUpdate: (v) => {
-      const o = Math.max(0, Math.min(1, v));
-      const scale = 0.965 + 0.035 * o;
-      const blur = (1 - o) * 6;
-      const translate = (1 - o) * -8;
-      detailEl.style.opacity = o;
-      detailEl.style.transform = `translateY(${translate}px) scale(${scale})`;
-      detailEl.style.filter = `blur(${blur}px)`;
-      detailEl.style.maxHeight = v <= 0.001 ? '0px' : `${Math.min(v, 1) * 360}px`;
-      detailEl.style.padding = v <= 0.02 ? '0px 32px' : '30px 32px';
-      detailEl.style.pointerEvents = v > 0.5 ? 'auto' : 'none';
-    }
-  });
-  detailEl.style.maxHeight = '0px';
-  detailEl.style.opacity = '0';
-  detailEl.style.overflow = 'hidden';
-
-  const contentSpring = new Spring({
-    value: 1, response: 0.22, damping: 1.0,
-    onUpdate: (v) => { detailInner.style.opacity = v; }
-  });
-
-  function toggleStageDesktop(i) {
-    const isSame = activeIndex === i;
-    stageEls.forEach(el => el.classList.remove('active'));
-    syncArchNodes(isSame ? null : i);
-
-    if (isSame) { panelSpring.setTarget(0); activeIndex = null; return; }
-
-    const wasOpen = activeIndex !== null;
-    activeIndex = i;
-    stageEls[i].classList.add('active');
-
-    const data = stagesData[i];
-    const swapContent = () => {
-      headingEl.childNodes[headingEl.childNodes.length - 1].textContent = data.heading;
-      textEl.textContent = data.text;
-      badgesEl.innerHTML = data.badges.map(b => `<span class="badge">${b}</span>`).join('');
-      contentSpring.jumpTo(0);
-      contentSpring.setTarget(1);
-    };
-
-    if (wasOpen) { contentSpring.setTarget(0); setTimeout(swapContent, 90); }
-    else { swapContent(); }
-
-    panelSpring.setTarget(1);
-  }
-
   /* ---------- Mobile: per-card accordion ---------- */
+
+  let mobileActiveIndex = null;
+  let mobilePanel = null;
+  let mobileSpring = null;
 
   function mobilePanelMarkup(data) {
     return `
@@ -149,98 +106,165 @@ function initPipeline(stagesData, { openIndex = 0 } = {}) {
     requestAnimationFrame(() => spring.setTarget(1));
   }
 
-  function toggleStageMobile(i) {
+  function toggleMobileStage(i) {
     const isSame = mobileActiveIndex === i;
     stageEls.forEach(el => el.classList.remove('active'));
-
     if (mobileActiveIndex !== null) closeMobilePanel();
-
     if (isSame) { mobileActiveIndex = null; return; }
-
     mobileActiveIndex = i;
     stageEls[i].classList.add('active');
     openMobilePanel(i);
   }
 
-  function toggleStage(i) {
-    if (mobileQuery.matches) toggleStageMobile(i);
-    else toggleStageDesktop(i);
-  }
-
-  // Crossing the breakpoint mid-session (devtools resize, tablet rotation)
-  // — reset hard rather than trying to carry accordion/panel state across.
   mobileQuery.addEventListener('change', () => {
     stageEls.forEach(el => el.classList.remove('active'));
     if (mobilePanel) { mobilePanel.remove(); mobilePanel = null; mobileSpring = null; }
     mobileActiveIndex = null;
     activeIndex = null;
     panelSpring.jumpTo(0);
-    syncArchNodes(null);
+    document.querySelectorAll('.diagram-node').forEach(n => n.classList.remove('active'));
   });
 
-  /* ---------- Optional desktop architecture diagram ---------- */
-  // Present only on pages that include the .arch-diagram markup (currently
-  // the offerte case study); a no-op everywhere else.
+  /* ---------- Shared #detail panel ---------- */
 
-  function syncArchNodes(i) {
-    const nodes = document.querySelectorAll('.arch-node');
-    if (!nodes.length) return;
-    nodes.forEach(n => n.classList.toggle('active', i !== null && parseInt(n.dataset.stage, 10) === i));
+  const panelSpring = new Spring({
+    value: 0, response: 0.36, damping: 0.86,
+    onUpdate: (v) => {
+      const o = Math.max(0, Math.min(1, v));
+      const scale = 0.965 + 0.035 * o;
+      const blur = (1 - o) * 6;
+      const translate = (1 - o) * -8;
+      detailEl.style.opacity = o;
+      detailEl.style.transform = `translateY(${translate}px) scale(${scale})`;
+      detailEl.style.filter = `blur(${blur}px)`;
+      detailEl.style.maxHeight = v <= 0.001 ? '0px' : `${Math.min(v, 1) * 360}px`;
+      detailEl.style.padding = v <= 0.02 ? '0px 32px' : '30px 32px';
+      detailEl.style.pointerEvents = v > 0.5 ? 'auto' : 'none';
+    }
+  });
+  detailEl.style.maxHeight = '0px';
+  detailEl.style.opacity = '0';
+  detailEl.style.overflow = 'hidden';
+
+  const contentSpring = new Spring({
+    value: 1, response: 0.22, damping: 1.0,
+    onUpdate: (v) => { detailInner.style.opacity = v; }
+  });
+
+  function swapDetail(data, wasOpen) {
+    const apply = () => {
+      headingEl.childNodes[headingEl.childNodes.length - 1].textContent = data.heading;
+      textEl.textContent = data.text;
+      badgesEl.innerHTML = data.badges.map(b => `<span class="badge">${b}</span>`).join('');
+      contentSpring.jumpTo(0);
+      contentSpring.setTarget(1);
+    };
+    if (wasOpen) { contentSpring.setTarget(0); setTimeout(apply, 90); }
+    else { apply(); }
+    panelSpring.setTarget(1);
   }
 
-  (function initArchDiagram() {
-    const wrap = document.querySelector('.arch-diagram');
-    if (!wrap) return;
-    const path = document.getElementById('archPath');
-    const pulse = document.getElementById('archPulse');
-    if (!path || !pulse) return;
+  // Which .stage (by index) currently owns the shared panel — only reached
+  // on desktop pages WITHOUT a diagram (the diagram hides the stage grid).
+  let activeIndex = null;
 
-    const len = path.getTotalLength();
-    path.style.strokeDasharray = String(len);
-    path.style.strokeDashoffset = String(len);
-    pulse.style.opacity = '0';
+  function toggleStageDesktop(i) {
+    const isSame = activeIndex === i;
+    stageEls.forEach(el => el.classList.remove('active'));
+    if (isSame) { panelSpring.setTarget(0); activeIndex = null; return; }
+    const wasOpen = activeIndex !== null;
+    activeIndex = i;
+    stageEls[i].classList.add('active');
+    swapDetail(stagesData[i], wasOpen);
+  }
 
-    const drawSpring = new Spring({
-      value: 0, response: 1.1, damping: 1,
-      onUpdate: v => { path.style.strokeDashoffset = String(len * (1 - Math.max(0, Math.min(1, v)))); }
+  if (mobileQuery.matches) {
+    if (openIndex !== null) toggleMobileStage(openIndex);
+  } else if (!hasDiagram && openIndex !== null) {
+    toggleStageDesktop(openIndex);
+  }
+
+  /* ---------- Desktop: architecture diagram ---------- */
+
+  let diagramActiveNode = null;
+
+  function openDiagramNode(node, data) {
+    const isSame = diagramActiveNode === node;
+    document.querySelectorAll('.diagram-node').forEach(n => n.classList.remove('active'));
+    if (isSame) { panelSpring.setTarget(0); diagramActiveNode = null; return; }
+    const wasOpen = diagramActiveNode !== null;
+    diagramActiveNode = node;
+    node.classList.add('active');
+    swapDetail(data, wasOpen);
+  }
+
+  (function initDiagram() {
+    const wrap = document.querySelector('.diagram-wrap');
+    if (!wrap || !diagramData) return;
+
+    const nodes = Array.from(wrap.querySelectorAll('.diagram-node'));
+    nodes.forEach((node, i) => {
+      attachMagneticTilt(node, { maxTilt: 6, lift: -2, hoverScale: 1.02, downScale: 0.97 });
+      node.addEventListener('click', () => openDiagramNode(node, diagramData[i]));
     });
 
-    let pulseRAF = null;
-    function startPulse() {
-      if (REDUCED_MOTION || pulseRAF) return;
-      const duration = 3200;
-      let start = null;
-      pulse.style.opacity = '1';
-      const frame = (t) => {
-        if (!start) start = t;
-        const progress = ((t - start) % duration) / duration;
-        const pt = path.getPointAtLength(progress * len);
-        pulse.setAttribute('cx', pt.x);
-        pulse.setAttribute('cy', pt.y);
-        pulseRAF = requestAnimationFrame(frame);
-      };
-      pulseRAF = requestAnimationFrame(frame);
+    const paths = Array.from(wrap.querySelectorAll('.diagram-path'));
+    const pulse = wrap.querySelector('.diagram-pulse');
+
+    if (paths.length) {
+      const lengths = paths.map(p => p.getTotalLength());
+      paths.forEach((p, i) => {
+        p.style.strokeDasharray = String(lengths[i]);
+        p.style.strokeDashoffset = String(lengths[i]);
+      });
+
+      let pendingSprings = 0;
+      const drawSprings = paths.map((p, i) => new Spring({
+        value: 0, response: 0.65, damping: 1,
+        onUpdate: v => { p.style.strokeDashoffset = String(lengths[i] * (1 - Math.max(0, Math.min(1, v)))); },
+        onSettle: () => { pendingSprings--; if (pendingSprings <= 0) runPulseOnce(); }
+      }));
+
+      function runPulseOnce() {
+        if (REDUCED_MOTION || !pulse) return;
+        const totalLen = lengths.reduce((a, b) => a + b, 0);
+        const duration = 1300;
+        let start = null;
+        pulse.style.opacity = '1';
+        function frame(t) {
+          if (!start) start = t;
+          const elapsed = t - start;
+          const progressLen = Math.min(elapsed / duration, 1) * totalLen;
+          let acc = 0, segIndex = 0, localLen = 0;
+          for (let i = 0; i < lengths.length; i++) {
+            const segEnd = acc + lengths[i];
+            if (progressLen <= segEnd || i === lengths.length - 1) {
+              segIndex = i;
+              localLen = Math.max(0, Math.min(progressLen - acc, lengths[i]));
+              break;
+            }
+            acc = segEnd;
+          }
+          const pt = paths[segIndex].getPointAtLength(localLen);
+          pulse.setAttribute('cx', pt.x);
+          pulse.setAttribute('cy', pt.y);
+          if (elapsed < duration) requestAnimationFrame(frame);
+          else pulse.style.opacity = '0';
+        }
+        requestAnimationFrame(frame);
+      }
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          pendingSprings = drawSprings.length;
+          drawSprings.forEach((s, i) => setTimeout(() => s.setTarget(1), i * 140));
+          io.unobserve(entry.target);
+        });
+      }, { threshold: 0.35 });
+      io.observe(wrap);
     }
 
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        drawSpring.setTarget(1);
-        setTimeout(startPulse, 900);
-        io.unobserve(entry.target);
-      });
-    }, { threshold: 0.4 });
-    io.observe(wrap);
-
-    wrap.querySelectorAll('.arch-node').forEach(node => {
-      const idx = parseInt(node.dataset.stage, 10);
-      attachMagneticTilt(node, { maxTilt: 5, lift: -2, hoverScale: 1.03, downScale: 0.96 });
-      node.addEventListener('click', () => {
-        toggleStage(idx);
-        stagesEl.scrollIntoView({ behavior: REDUCED_MOTION ? 'auto' : 'smooth', block: 'center' });
-      });
-    });
+    if (nodes.length) openDiagramNode(nodes[0], diagramData[0]);
   })();
-
-  if (openIndex !== null) toggleStage(openIndex);
 }

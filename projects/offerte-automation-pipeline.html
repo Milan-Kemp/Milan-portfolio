@@ -47,48 +47,53 @@
       <div class="section-hint observe">Beweeg over een stap, klik voor details</div>
     </div>
 
-    <div class="arch-diagram observe">
-      <svg class="arch-svg" viewBox="0 0 1000 34" preserveAspectRatio="none" aria-hidden="true">
+    <!-- Desktop: architecture diagram. Hidden on mobile (CSS), where the
+         .stages grid below (class="diagram-fallback") is the only visible
+         version — never both at once. -->
+    <div class="diagram-wrap observe">
+      <svg class="diagram-svg" viewBox="0 0 1000 36" preserveAspectRatio="none" aria-hidden="true">
         <defs>
-          <linearGradient id="archGrad" x1="0" y1="0" x2="1" y2="0">
+          <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style="stop-color: var(--accent);" />
             <stop offset="100%" style="stop-color: var(--accent2);" />
           </linearGradient>
-          <marker id="archArrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
-            <path d="M0,0 L9,4.5 L0,9 Z" style="fill: var(--accent2);" />
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill: var(--accent2);" />
           </marker>
         </defs>
-        <path id="archPath" d="M 60 17 L 930 17" fill="none" style="stroke: url(#archGrad);" stroke-width="2.5" stroke-linecap="round" marker-end="url(#archArrow)" />
-        <circle id="archPulse" cx="60" cy="17" r="5" style="fill: var(--accent); filter: drop-shadow(0 0 4px rgba(65,194,29,0.7));" />
+        <path class="diagram-path" d="M 115 18 L 350 18" marker-end="url(#arrow)" />
+        <path class="diagram-path" d="M 445 18 L 555 18" marker-end="url(#arrow)" />
+        <path class="diagram-path" d="M 650 18 L 875 18" marker-end="url(#arrow)" />
+        <circle class="diagram-pulse" r="5" style="fill: var(--accent); filter: drop-shadow(0 0 4px rgba(65,194,29,0.7)); opacity: 0;" />
       </svg>
-      <div class="arch-nodes">
-        <button class="arch-node" type="button" data-stage="2" aria-label="Lovable — bekijk details">
-          <span class="arch-node-icon">◆</span>
-          <span class="arch-node-name">Lovable</span>
-          <span class="arch-node-role">dashboard</span>
+      <div class="nodes-row">
+        <button class="diagram-node" type="button" aria-label="Lovable — bekijk details">
+          <div class="stage-num">◆</div>
+          <div class="stage-title">Lovable</div>
+          <div class="stage-sub">dashboard</div>
         </button>
-        <button class="arch-node" type="button" data-stage="3" aria-label="N8N — bekijk details">
-          <span class="arch-node-icon">◆</span>
-          <span class="arch-node-name">N8N</span>
-          <span class="arch-node-role">workflow</span>
+        <button class="diagram-node" type="button" aria-label="N8N — bekijk details">
+          <div class="stage-num">◆</div>
+          <div class="stage-title">N8N</div>
+          <div class="stage-sub">workflow</div>
         </button>
-        <button class="arch-node" type="button" data-stage="1" aria-label="Claude API — bekijk details">
-          <span class="arch-node-icon">◆</span>
-          <span class="arch-node-name">Claude API</span>
-          <span class="arch-node-role">extractie</span>
+        <button class="diagram-node" type="button" aria-label="Claude API — bekijk details">
+          <div class="stage-num">◆</div>
+          <div class="stage-title">Claude API</div>
+          <div class="stage-sub">extractie</div>
         </button>
-        <button class="arch-node" type="button" data-stage="4" aria-label="FastAPI / Render — bekijk details">
-          <span class="arch-node-icon">◆</span>
-          <span class="arch-node-name">FastAPI / Render</span>
-          <span class="arch-node-role">documentgeneratie</span>
+        <button class="diagram-node" type="button" aria-label="FastAPI / Render — bekijk details">
+          <div class="stage-num">◆</div>
+          <div class="stage-title">FastAPI / Render</div>
+          <div class="stage-sub">documentgeneratie</div>
         </button>
       </div>
     </div>
 
+    <!-- Mobile: accordion fallback (also the data source the diagram reuses
+         via initPipeline's stagesData). Hidden on desktop via CSS. -->
     <div class="pipeline">
-      <div class="pipeline-track"></div>
-      <div class="flow-dot"></div>
-      <div class="stages" id="stages"></div>
+      <div class="stages diagram-fallback" id="stages"></div>
     </div>
 
     <div class="detail" id="detail">
@@ -211,7 +216,26 @@ document.addEventListener('DOMContentLoaded', () => {
       badges: ["python-docx", "Geschiedenis-pagina"] }
   ];
 
-  initPipeline(stagesData, { openIndex: 0 });
+  // Desktop diagram: 4 systems instead of 6 stages. Claude API absorbs the
+  // Upload step (it's the input Claude API reads) and FastAPI/Render
+  // absorbs Output (it's the format the service writes) — Lovable and N8N
+  // map 1:1 to their own stage. Mobile still uses the 6 stages above as-is.
+  const diagramData = [
+    stagesData[2], // Lovable -> Review
+    stagesData[3], // N8N -> Orkestratie
+    {
+      heading: "Input & extractie",
+      text: "Eén of meerdere leveranciersdocumenten (PDF, Word, Excel) worden geüpload en direct door Claude API verwerkt: regelitems, prijzen en specificaties worden uit het brondocument gehaald en omgezet naar gestructureerde data. Validators vangen edge cases op, zoals lege velden die anders de rest van de pipeline zouden breken.",
+      badges: ["Multi-file upload", "Claude API", "Pydantic validators"]
+    },
+    {
+      heading: "Documentgeneratie",
+      text: "Claude Code bouwde een Python/FastAPI-microservice die de data omzet in het uiteindelijke document, met ReFurnity-huisstijl. Ik bepaalde de architectuur en API-contracten, Claude Code implementeerde de service. Het eindresultaat wordt opgeslagen in een geschiedenis-overzicht, gegroepeerd per klant.",
+      badges: ["Python", "FastAPI", "Render", "python-docx", "Geschiedenis-pagina"]
+    }
+  ];
+
+  initPipeline(stagesData, { openIndex: 0, diagramData });
 });
 </script>
 
