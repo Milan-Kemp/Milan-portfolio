@@ -47,64 +47,10 @@
       <div class="section-hint observe">Beweeg over een stap, klik voor details</div>
     </div>
 
-    <!-- Desktop: N8N-canvas style diagram. Hidden on mobile (CSS), where the
-         .stages grid below (class="diagram-fallback") is the only visible
-         version — never both at once. Connector paths are computed in JS
-         from real port positions (pipeline.js). -->
-    <div class="canvas observe">
-      <svg class="canvas-svg" viewBox="0 0 1000 160" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="connGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color: var(--accent);" />
-            <stop offset="100%" style="stop-color: var(--accent2);" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <div class="nodes-row">
-        <button class="node is-source" type="button" aria-label="Lovable — bekijk details">
-          <div class="node-icon icon-lovable">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>
-            </svg>
-          </div>
-          <div class="node-text"><div class="node-title">Lovable</div><div class="node-sub">dashboard</div></div>
-          <span class="port port-in" aria-hidden="true"></span><span class="port port-out" aria-hidden="true"></span>
-        </button>
-        <button class="node is-source" type="button" aria-label="N8N — bekijk details">
-          <div class="node-icon icon-n8n">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/>
-              <path d="M8.2 6h7.6M8.2 6 15.8 18"/>
-            </svg>
-          </div>
-          <div class="node-text"><div class="node-title">N8N</div><div class="node-sub">workflow</div></div>
-          <span class="port port-in" aria-hidden="true"></span><span class="port port-out" aria-hidden="true"></span>
-        </button>
-        <button class="node is-source" type="button" aria-label="Claude API — bekijk details">
-          <div class="node-icon icon-claude">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/>
-            </svg>
-          </div>
-          <div class="node-text"><div class="node-title">Claude API</div><div class="node-sub">extractie</div></div>
-          <span class="port port-in" aria-hidden="true"></span><span class="port port-out" aria-hidden="true"></span>
-        </button>
-        <button class="node" type="button" aria-label="FastAPI / Render — bekijk details">
-          <div class="node-icon icon-render">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>
-            </svg>
-          </div>
-          <div class="node-text"><div class="node-title">FastAPI</div><div class="node-sub">Render</div></div>
-          <span class="port port-in" aria-hidden="true"></span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Mobile: accordion fallback (also the data source the diagram reuses
-         via initPipeline's stagesData). Hidden on desktop via CSS. -->
     <div class="pipeline">
-      <div class="stages diagram-fallback" id="stages"></div>
+      <div class="pipeline-track"></div>
+      <div class="flow-dot"></div>
+      <div class="stages" id="stages"></div>
     </div>
 
     <div class="detail" id="detail">
@@ -227,26 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
       badges: ["python-docx", "Geschiedenis-pagina"] }
   ];
 
-  // Desktop diagram: 4 systems instead of 6 stages. Claude API absorbs the
-  // Upload step (it's the input Claude API reads) and FastAPI/Render
-  // absorbs Output (it's the format the service writes) — Lovable and N8N
-  // map 1:1 to their own stage. Mobile still uses the 6 stages above as-is.
-  const diagramData = [
-    stagesData[2], // Lovable -> Review
-    stagesData[3], // N8N -> Orkestratie
-    {
-      heading: "Input & extractie",
-      text: "Eén of meerdere leveranciersdocumenten (PDF, Word, Excel) worden geüpload en direct door Claude API verwerkt: regelitems, prijzen en specificaties worden uit het brondocument gehaald en omgezet naar gestructureerde data. Validators vangen edge cases op, zoals lege velden die anders de rest van de pipeline zouden breken.",
-      badges: ["Multi-file upload", "Claude API", "Pydantic validators"]
-    },
-    {
-      heading: "Documentgeneratie",
-      text: "Claude Code bouwde een Python/FastAPI-microservice die de data omzet in het uiteindelijke document, met ReFurnity-huisstijl. Ik bepaalde de architectuur en API-contracten, Claude Code implementeerde de service. Het eindresultaat wordt opgeslagen in een geschiedenis-overzicht, gegroepeerd per klant.",
-      badges: ["Python", "FastAPI", "Render", "python-docx", "Geschiedenis-pagina"]
-    }
-  ];
-
-  initPipeline(stagesData, { openIndex: 0, diagramData });
+  initPipeline(stagesData, { openIndex: 0 });
 });
 </script>
 
