@@ -347,10 +347,27 @@ h1 em {
   border-radius: 16px; padding: 16px 18px;
   background: linear-gradient(155deg, #ffffff, #fbfaf5 75%);
   box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  outline: none;
 }
+
+.other-item:focus-visible { box-shadow: var(--shadow-hover), 0 0 0 3px rgba(65,194,29,0.45); }
+.other-item.active { border-color: var(--accent-line); }
 
 .other-item .other-title { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: -0.01em; color: var(--text); }
 .other-item .other-meta { font-family: var(--mono); font-size: 11.5px; color: var(--text-faint); margin-top: 5px; line-height: 1.5; }
+
+.other-detail { overflow: hidden; }
+.other-detail p {
+  font-family: var(--mono); font-size: 11px; line-height: 1.6; color: var(--text-dim);
+  padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--border);
+}
+.other-link {
+  display: inline-block; margin-top: 6px;
+  font-family: var(--mono); font-size: 11px; color: var(--accent-text);
+  text-decoration: none; border-bottom: 1px solid var(--border-strong);
+}
+.other-link:hover { border-color: var(--accent); }
 
 /* ---------- CARD INTERACTIONS: spotlight + subtle lift ---------- */
 

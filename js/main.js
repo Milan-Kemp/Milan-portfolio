@@ -31,8 +31,62 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.count').forEach((el, i) => setTimeout(() => animateCount(el), 450 + i * 80));
 
   setupCardLinks();
+  setupOtherItems();
   setupDotNav();
 });
+
+/* Makes each .other-item its own accordion: click/Enter springs open a
+   short description directly beneath it (blur + scale + opacity fade-in,
+   same materialize pattern as the pipeline stages' mobile accordion),
+   independent per card — no shared panel. */
+function setupOtherItems() {
+  document.querySelectorAll('.other-item').forEach(card => {
+    const detail = card.querySelector('.other-detail');
+    if (!detail) return;
+    const title = card.querySelector('.other-title');
+
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-expanded', 'false');
+    if (title) card.setAttribute('aria-label', `${title.textContent.trim()} — meer info`);
+
+    detail.style.overflow = 'hidden';
+    detail.style.maxHeight = '0px';
+    detail.style.opacity = '0';
+
+    let open = false;
+    let targetHeight = 0;
+    const spring = new Spring({
+      value: 0, response: 0.36, damping: 0.86,
+      onUpdate: (v) => {
+        const o = Math.max(0, Math.min(1, v));
+        const scale = 0.965 + 0.035 * o;
+        const blur = (1 - o) * 6;
+        const translate = (1 - o) * -8;
+        detail.style.opacity = o;
+        detail.style.transform = `translateY(${translate}px) scale(${scale})`;
+        detail.style.filter = `blur(${blur}px)`;
+        detail.style.maxHeight = v <= 0.001 ? '0px' : `${Math.min(v, 1) * targetHeight}px`;
+      }
+    });
+
+    function toggle() {
+      open = !open;
+      if (open) targetHeight = detail.scrollHeight;
+      card.classList.toggle('active', open);
+      card.setAttribute('aria-expanded', String(open));
+      spring.setTarget(open ? 1 : 0);
+    }
+
+    card.addEventListener('click', toggle);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); toggle(); }
+    });
+
+    const link = detail.querySelector('.other-link');
+    if (link) link.addEventListener('click', (e) => e.stopPropagation());
+  });
+}
 
 /* Makes .project-card[data-href] navigate on click anywhere in the card
    (not just the "Bekijk case study" text), while the GitHub link stays
