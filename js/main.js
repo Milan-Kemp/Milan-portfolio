@@ -35,11 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
   setupDotNav();
 });
 
-/* Makes each .other-item its own accordion: click/Enter springs open a
-   short description directly beneath it (blur + scale + opacity fade-in,
-   same materialize pattern as the pipeline stages' mobile accordion),
-   independent per card — no shared panel. */
+/* Accordion group across all .other-item cards: opening one closes
+   whichever other card was open (same single-open pattern the pipeline
+   stages use), driven by the same materialize spring (blur + scale +
+   opacity) per card. */
 function setupOtherItems() {
+  let activeClose = null;
+
   document.querySelectorAll('.other-item').forEach(card => {
     const detail = card.querySelector('.other-detail');
     if (!detail) return;
@@ -55,7 +57,6 @@ function setupOtherItems() {
     detail.style.maxHeight = '0px';
     detail.style.opacity = '0';
 
-    let open = false;
     let targetHeight = 0;
     const spring = new Spring({
       value: 0, response: 0.36, damping: 0.86,
@@ -72,12 +73,25 @@ function setupOtherItems() {
       }
     });
 
+    function close() {
+      card.classList.remove('active');
+      card.setAttribute('aria-expanded', 'false');
+      spring.setTarget(0);
+    }
+
+    function open() {
+      targetHeight = detail.scrollHeight;
+      card.classList.add('active');
+      card.setAttribute('aria-expanded', 'true');
+      spring.setTarget(1);
+    }
+
     function toggle() {
-      open = !open;
-      if (open) targetHeight = detail.scrollHeight;
-      card.classList.toggle('active', open);
-      card.setAttribute('aria-expanded', String(open));
-      spring.setTarget(open ? 1 : 0);
+      const isOpen = card.classList.contains('active');
+      if (isOpen) { close(); activeClose = null; return; }
+      if (activeClose) activeClose();
+      open();
+      activeClose = close;
     }
 
     card.addEventListener('click', toggle);

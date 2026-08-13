@@ -340,7 +340,7 @@ h1 em {
 
 /* ---------- OTHER WORK (compact) ---------- */
 
-.other-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.other-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; align-items: start; }
 
 .other-item {
   position: relative;
