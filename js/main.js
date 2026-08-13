@@ -37,14 +37,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* Accordion group across all .other-item cards: opening one closes
    whichever other card was open (same single-open pattern the pipeline
-   stages use), driven by the same materialize spring (blur + scale +
-   opacity) per card. */
+   stages use). Height is animated purely via CSS grid-template-rows
+   (0fr -> 1fr on .other-item-body, see styles.css) so two cards changing
+   height at once — one closing, one opening — settle on the same
+   browser-driven timeline instead of two independently-ticking JS
+   springs, which is what caused the double layout-jump. The JS Spring
+   here only drives the inner content's materialize fade (blur/scale/
+   opacity) and the chevron rotation, never the height. */
 function setupOtherItems() {
   let activeClose = null;
 
   document.querySelectorAll('.other-item').forEach(card => {
-    const detail = card.querySelector('.other-detail');
-    if (!detail) return;
+    const body = card.querySelector('.other-item-body');
+    const inner = body ? body.firstElementChild : null;
+    if (!body || !inner) return;
     const title = card.querySelector('.other-title');
     const icon = card.querySelector('.other-toggle-icon');
 
@@ -53,11 +59,8 @@ function setupOtherItems() {
     card.setAttribute('aria-expanded', 'false');
     if (title) card.setAttribute('aria-label', `${title.textContent.trim()} — meer info`);
 
-    detail.style.overflow = 'hidden';
-    detail.style.maxHeight = '0px';
-    detail.style.opacity = '0';
+    inner.style.opacity = '0';
 
-    let targetHeight = 0;
     const spring = new Spring({
       value: 0, response: 0.36, damping: 0.86,
       onUpdate: (v) => {
@@ -65,10 +68,9 @@ function setupOtherItems() {
         const scale = 0.965 + 0.035 * o;
         const blur = (1 - o) * 6;
         const translate = (1 - o) * -8;
-        detail.style.opacity = o;
-        detail.style.transform = `translateY(${translate}px) scale(${scale})`;
-        detail.style.filter = `blur(${blur}px)`;
-        detail.style.maxHeight = v <= 0.001 ? '0px' : `${Math.min(v, 1) * targetHeight}px`;
+        inner.style.opacity = o;
+        inner.style.transform = `translateY(${translate}px) scale(${scale})`;
+        inner.style.filter = `blur(${blur}px)`;
         if (icon) icon.style.transform = `rotate(${o * 180}deg)`;
       }
     });
@@ -80,7 +82,6 @@ function setupOtherItems() {
     }
 
     function open() {
-      targetHeight = detail.scrollHeight;
       card.classList.add('active');
       card.setAttribute('aria-expanded', 'true');
       spring.setTarget(1);
@@ -99,7 +100,7 @@ function setupOtherItems() {
       if (e.key === 'Enter') { e.preventDefault(); toggle(); }
     });
 
-    const link = detail.querySelector('.other-link');
+    const link = inner.querySelector('.other-link');
     if (link) link.addEventListener('click', (e) => e.stopPropagation());
   });
 }

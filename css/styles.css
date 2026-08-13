@@ -368,8 +368,24 @@ h1 em {
 .other-toggle-icon svg { width: 12px; height: 12px; }
 .other-item.active .other-toggle-icon { color: var(--accent-text); }
 
-.other-detail { overflow: hidden; }
-.other-detail p {
+/* 0fr->1fr grid-rows technique: lets the row height animate to its real
+   content height without a JS-measured pixel value, and — unlike
+   max-height — stays perfectly in sync when one card closes at the same
+   moment another opens, since both are just CSS custom-property-free
+   grid track transitions running on the browser's own timeline instead
+   of two independently-ticking JS springs. The inner div is the required
+   grid-row child; blur/opacity/scale on it still comes from the JS
+   Spring (materialize look), only the height leaves JS entirely. */
+.other-item-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.other-item.active .other-item-body { grid-template-rows: 1fr; }
+@media (prefers-reduced-motion: reduce) { .other-item-body { transition: none; } }
+
+.other-item-body > div { overflow: hidden; min-height: 0; }
+.other-item-body p {
   font-family: var(--mono); font-size: 11px; line-height: 1.6; color: var(--text-dim);
   padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--border);
 }
