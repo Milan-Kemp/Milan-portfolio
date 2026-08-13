@@ -37,15 +37,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* Accordion group across all .other-item cards: opening one closes
    whichever other card was open (same single-open pattern the pipeline
-   stages use). Height is animated purely via CSS grid-template-rows
-   (0fr -> 1fr on .other-item-body, see styles.css) so two cards changing
-   height at once — one closing, one opening — settle on the same
-   browser-driven timeline instead of two independently-ticking JS
-   springs, which is what caused the double layout-jump. The JS Spring
-   here only drives the inner content's materialize fade (blur/scale/
-   opacity) and the chevron rotation, never the height. */
+   stages use). Per-card row height (.other-item-body's grid-template-rows)
+   now switches instantly, with no transition of its own — animating that
+   independently per card was the bug: card A's row and card B's row live
+   in different grid rows that reflow independently, so the two height
+   changes drift out of sync and the page height dips and springs back
+   instead of moving on one curve. flipGridHeight()
+   below animates the .other-grid CONTAINER's overall height instead
+   (classic FLIP: measure before, mutate the DOM, measure after, lock the
+   box at the old height, force a reflow, then transition to the new
+   height) so there is exactly one height animation for the whole
+   section, not two competing ones. The JS Spring still drives each
+   card's inner content fade (blur/scale/opacity) and chevron rotation —
+   unrelated to layout height, so it runs independently underneath. */
 function setupOtherItems() {
+  const grid = document.querySelector('.other-grid');
   let activeClose = null;
+  let flipGen = 0;
+
+  function flipGridHeight(mutate) {
+    if (!grid || REDUCED_MOTION) { mutate(); return; }
+
+    const startHeight = grid.getBoundingClientRect().height;
+    mutate();
+    const endHeight = grid.getBoundingClientRect().height;
+    if (Math.abs(endHeight - startHeight) < 0.5) return;
+
+    const gen = ++flipGen;
+    grid.style.transition = 'none';
+    grid.style.overflow = 'hidden';
+    grid.style.height = `${startHeight}px`;
+    grid.getBoundingClientRect(); // force reflow at the locked start height
+
+    requestAnimationFrame(() => {
+      if (gen !== flipGen) return;
+      requestAnimationFrame(() => {
+        if (gen !== flipGen) return;
+        grid.style.transition = 'height 380ms cubic-bezier(0.16, 1, 0.3, 1)';
+        grid.style.height = `${endHeight}px`;
+      });
+    });
+
+    grid.addEventListener('transitionend', function onEnd(e) {
+      if (e.target !== grid || e.propertyName !== 'height') return;
+      grid.removeEventListener('transitionend', onEnd);
+      if (gen !== flipGen) return;
+      grid.style.height = 'auto';
+      grid.style.overflow = '';
+      grid.style.transition = '';
+    });
+  }
 
   document.querySelectorAll('.other-item').forEach(card => {
     const body = card.querySelector('.other-item-body');
@@ -89,10 +130,12 @@ function setupOtherItems() {
 
     function toggle() {
       const isOpen = card.classList.contains('active');
-      if (isOpen) { close(); activeClose = null; return; }
-      if (activeClose) activeClose();
-      open();
-      activeClose = close;
+      flipGridHeight(() => {
+        if (isOpen) { close(); activeClose = null; return; }
+        if (activeClose) activeClose();
+        open();
+        activeClose = close;
+      });
     }
 
     card.addEventListener('click', toggle);
