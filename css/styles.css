@@ -343,8 +343,9 @@ h1 em {
 .other-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
 
 .other-item {
+  position: relative;
   border: 1px solid var(--border);
-  border-radius: 16px; padding: 16px 18px;
+  border-radius: 16px; padding: 16px 40px 16px 18px;
   background: linear-gradient(155deg, #ffffff, #fbfaf5 75%);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
@@ -356,6 +357,16 @@ h1 em {
 
 .other-item .other-title { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: -0.01em; color: var(--text); }
 .other-item .other-meta { font-family: var(--mono); font-size: 11.5px; color: var(--text-faint); margin-top: 5px; line-height: 1.5; }
+
+.other-toggle-icon {
+  position: absolute; top: 16px; right: 16px;
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-faint);
+  will-change: transform;
+}
+.other-toggle-icon svg { width: 12px; height: 12px; }
+.other-item.active .other-toggle-icon { color: var(--accent-text); }
 
 .other-detail { overflow: hidden; }
 .other-detail p {

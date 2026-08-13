@@ -44,6 +44,7 @@ function setupOtherItems() {
     const detail = card.querySelector('.other-detail');
     if (!detail) return;
     const title = card.querySelector('.other-title');
+    const icon = card.querySelector('.other-toggle-icon');
 
     card.setAttribute('tabindex', '0');
     card.setAttribute('role', 'button');
@@ -67,6 +68,7 @@ function setupOtherItems() {
         detail.style.transform = `translateY(${translate}px) scale(${scale})`;
         detail.style.filter = `blur(${blur}px)`;
         detail.style.maxHeight = v <= 0.001 ? '0px' : `${Math.min(v, 1) * targetHeight}px`;
+        if (icon) icon.style.transform = `rotate(${o * 180}deg)`;
       }
     });
 
