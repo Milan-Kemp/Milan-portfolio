@@ -373,8 +373,20 @@ h1 em {
   color: var(--text-faint);
   will-change: transform;
 }
-.other-toggle-icon svg { width: 12px; height: 12px; }
+/* Transform here is separate from the outer span's own transform (which
+   the open/close Spring drives every frame, inline) — putting the hover
+   nudge on the inner svg instead avoids the CSS transition fighting the
+   Spring for the same property. */
+.other-toggle-icon svg {
+  width: 12px; height: 12px;
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
 .other-item.active .other-toggle-icon { color: var(--accent-text); }
+.other-item:hover .other-toggle-icon svg,
+.other-item:focus-visible .other-toggle-icon svg,
+.other-item:active .other-toggle-icon svg {
+  transform: translateX(2px);
+}
 
 /* 0fr->1fr grid-rows gives the row its real content height with no
    JS-measured pixel value, but the row itself switches state instantly
@@ -395,10 +407,14 @@ h1 em {
 }
 .other-link {
   display: inline-block; margin-top: 6px;
-  font-family: var(--mono); font-size: 11px; color: var(--accent-text);
+  font-family: var(--mono); font-size: 11px; color: var(--text-dim);
   text-decoration: none; border-bottom: 1px solid var(--border-strong);
+  transition: color 240ms cubic-bezier(0.16, 1, 0.3, 1), border-color 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.other-link:hover { border-color: var(--accent); }
+.other-link:hover, .other-link:focus-visible, .other-link:active {
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
 
 /* ---------- CARD INTERACTIONS: spotlight + subtle lift ---------- */
 
