@@ -342,8 +342,13 @@ h1 em {
 
 /* min-height:0 overrides the grid container's default min-height:auto
    (which otherwise refuses to shrink below the content's natural size) —
-   without it, the FLIP height-lock in main.js has no visible effect. */
-.other-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; align-items: start; min-height: 0; }
+   without it, the FLIP height-lock in main.js has no visible effect.
+   overflow-anchor:none stops the browser's own scroll-anchoring from
+   nudging scrollY to compensate as this element's height changes — that
+   native compensation fights our own FLIP animation, most visibly on
+   rows near/below the fold where the browser has more "room" to anchor
+   against. */
+.other-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; align-items: start; min-height: 0; overflow-anchor: none; }
 
 .other-item {
   position: relative;
