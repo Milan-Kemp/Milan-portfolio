@@ -340,20 +340,12 @@ h1 em {
 
 /* ---------- OTHER WORK (compact) ---------- */
 
-/* min-height:0 overrides the grid container's default min-height:auto
-   (which otherwise refuses to shrink below the content's natural size) —
-   without it, the FLIP height-lock in main.js has no visible effect.
-   overflow-anchor:none stops the browser's own scroll-anchoring from
-   nudging scrollY to compensate as this element's height changes — that
-   native compensation fights our own FLIP animation, most visibly on
-   rows near/below the fold where the browser has more "room" to anchor
-   against. */
-.other-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; align-items: start; min-height: 0; overflow-anchor: none; }
+.other-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; align-items: start; }
 
 .other-item {
   position: relative;
   border: 1px solid var(--border);
-  border-radius: 16px; padding: 16px 40px 16px 18px;
+  border-radius: 16px; padding: 16px 18px;
   background: linear-gradient(155deg, #ffffff, #fbfaf5 75%);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
@@ -366,45 +358,6 @@ h1 em {
 .other-item .other-title { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: -0.01em; color: var(--text); }
 .other-item .other-meta { font-family: var(--mono); font-size: 11.5px; color: var(--text-faint); margin-top: 5px; line-height: 1.5; }
 
-.other-toggle-icon {
-  position: absolute; top: 16px; right: 16px;
-  width: 18px; height: 18px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--text-faint);
-  will-change: transform;
-}
-/* Transform here is separate from the outer span's own transform (which
-   the open/close Spring drives every frame, inline) — putting the hover
-   nudge on the inner svg instead avoids the CSS transition fighting the
-   Spring for the same property. */
-.other-toggle-icon svg {
-  width: 12px; height: 12px;
-  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.other-item.active .other-toggle-icon { color: var(--accent-text); }
-.other-item:hover .other-toggle-icon svg,
-.other-item:focus-visible .other-toggle-icon svg,
-.other-item:active .other-toggle-icon svg {
-  transform: translateX(2px);
-}
-
-/* 0fr->1fr grid-rows gives the row its real content height with no
-   JS-measured pixel value, but the row itself switches state instantly
-   (no transition here) — the visible height animation happens once, on
-   the whole .other-grid container, via the FLIP technique in main.js.
-   Animating each card's own row independently was the earlier bug: two
-   cards in different grid rows reflow on their own schedule, so the
-   page height doesn't move as a single curve. The inner div is the
-   required grid-row child; blur/opacity/scale on it still comes from
-   the JS Spring (materialize look). */
-.other-item-body { display: grid; grid-template-rows: 0fr; }
-.other-item.active .other-item-body { grid-template-rows: 1fr; }
-
-.other-item-body > div { overflow: hidden; min-height: 0; }
-.other-item-body p {
-  font-family: var(--mono); font-size: 11px; line-height: 1.6; color: var(--text-dim);
-  padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--border);
-}
 .other-link {
   display: inline-block; margin-top: 6px;
   font-family: var(--mono); font-size: 11px; color: var(--text-dim);

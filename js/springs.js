@@ -119,11 +119,6 @@ function attachScrollParallax(el, { factor = 0.06, max = 28, baseTransform = '' 
 function attachMagneticTilt(el, { maxTilt = 9, lift = -3, hoverScale = 1.02, downScale = 0.97, arrowEl = null } = {}) {
   let rx = 0, ry = 0, scale = 1, ty = 0;
   const apply = () => {
-    // Opt-in escape hatch: a consumer that needs exclusive control of
-    // el.style.transform for a moment (e.g. a position FLIP animation)
-    // can set el._tiltSuspended = true and this stops overwriting it,
-    // instead of the two silently fighting over the same property.
-    if (el._tiltSuspended) return;
     el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(${ty}px) scale(${scale})`;
     el.classList.toggle('is-lifted', scale > 1.005);
     if (arrowEl) {
