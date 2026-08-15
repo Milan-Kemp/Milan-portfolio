@@ -130,6 +130,23 @@ img { max-width: 100%; display: block; }
 
 .badges { display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* Rounder pill variant used inside pipeline detail panels (mobile accordion
+   + desktop node diagram) — some entries are plain <span>, others are real
+   <a> links out to the tool's official site (pipeline.js decides which). */
+.tag-pill {
+  display: inline-block;
+  font-family: var(--mono); font-size: 11.5px; color: var(--text);
+  background: linear-gradient(135deg, rgba(65,194,29,0.1), rgba(45,212,191,0.08));
+  border: 1px solid var(--border);
+  padding: 6px 12px; border-radius: 999px; letter-spacing: 0.01em;
+  will-change: transform;
+}
+a.tag-pill { text-decoration: none; color: var(--accent-text); cursor: pointer; }
+a.tag-pill:hover, a.tag-pill:focus-visible {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(65,194,29,0.18), rgba(45,212,191,0.14));
+}
+
 /* ---------- BUTTONS ---------- */
 
 .btn {
@@ -572,6 +589,15 @@ footer {
 
 @media (max-width: 780px) { .stages { grid-template-columns: 1fr; gap: 12px; } }
 
+/* Pages with a .canvas node diagram (both case studies): the stage grid is
+   superseded by the canvas on desktop and only serves as the mobile
+   accordion fallback there. Scoped to .diagram-fallback so any future page
+   without a diagram can keep .stages visible on desktop unchanged. */
+.stages.diagram-fallback { display: none; }
+@media (max-width: 780px) {
+  .stages.diagram-fallback { display: grid; grid-template-columns: 1fr; gap: 12px; }
+}
+
 .stage {
   position: relative;
   border: 1.5px solid transparent;
@@ -638,6 +664,97 @@ footer {
    stays collapsed there anyway since desktop's toggle path never runs, but
    this removes any doubt/reserved space. */
 @media (max-width: 780px) { #detail { display: none; } }
+
+/* ---------- ARCHITECTURE DIAGRAM (case studies, desktop only) ---------- */
+
+/* N8N-canvas style: dot-grid background, nodes as small cards with a left
+   icon + left/right connection ports, linked by bezier curves whose
+   endpoints are computed in JS from real port positions (pipeline.js) —
+   the only reliable option once padding is in play. The canvas has a
+   fixed pixel width (not fluid) so node layout never shrinks/reflows;
+   .canvas-scroll lets a narrow-but-still-desktop viewport scroll it
+   horizontally instead. */
+.canvas-scroll {
+  overflow-x: auto;
+  margin-bottom: 44px;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 780px) { .canvas-scroll { display: none; } }
+
+.canvas {
+  position: relative;
+  width: 934px;
+  border-radius: 24px;
+  padding: 56px 40px;
+  background-color: var(--surface-solid);
+  background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.canvas-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.conn { fill: none; stroke: url(#connGradient); stroke-width: 2.2; }
+.conn-pulse { fill: var(--accent); filter: drop-shadow(0 0 4px rgba(65,194,29,0.55)); }
+
+.nodes-row { position: relative; z-index: 2; display: flex; gap: 18px; }
+
+.node {
+  position: relative;
+  flex-shrink: 0;
+  width: 200px;
+  background: var(--surface-solid);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 14px 14px 60px;
+  min-height: 62px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  touch-action: manipulation;
+  font-family: inherit;
+  text-align: left;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.node.is-lifted { box-shadow: var(--shadow-hover); }
+
+.node.active {
+  border-color: transparent;
+  background-image:
+    linear-gradient(160deg, #ffffff, #fbfaf5),
+    linear-gradient(120deg, rgba(65,194,29,0.35), rgba(45,212,191,0.3));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.node-icon {
+  position: absolute; left: 12px; top: 14px; width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1.5px 2px rgba(255,255,255,0.5),
+    inset 0 -2px 3px rgba(0,0,0,0.15),
+    0 4px 10px rgba(30,60,10,0.18);
+}
+.node-icon::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.5), transparent 60%);
+}
+.node-icon svg { position: relative; z-index: 1; width: 18px; height: 18px; }
+.node-text { padding-top: 1px; }
+.icon-lovable { background: linear-gradient(135deg, var(--accent), #7fe05a); }
+.icon-n8n { background: linear-gradient(135deg, var(--accent2), #6ee7d8); }
+.icon-claude { background: linear-gradient(135deg, var(--accent3), #ffcf8a); }
+.icon-render { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+.icon-docs { background: linear-gradient(135deg, #5b8dd6, #93b8e8); }
+.node-title { font-family: var(--display); font-weight: 700; font-size: 14px; color: var(--text); line-height: 1.25; }
+.node-sub { font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); margin-top: 2px; }
+
+.port { position: absolute; top: 50%; transform: translateY(-50%); width: 9px; height: 9px; border-radius: 50%; background: var(--surface-solid); border: 2px solid var(--border-strong); }
+.port-in { left: -5px; }
+.port-out { right: -5px; }
+.node.is-source .port-out { border-color: var(--accent); }
 
 /* ---------- LESSON CALLOUT ---------- */
 
