@@ -531,6 +531,12 @@ footer {
 
 .footer-link.is-hover { color: var(--accent-text); border-color: var(--accent); }
 
+.footer-email-btn {
+  appearance: none; background: none;
+  border: none; border-bottom: 1px solid var(--border-strong);
+  padding: 0 0 2px;
+}
+
 /* ---------- CASE STUDY: PIPELINE (shared by /projects/*.html) ---------- */
 
 .pipeline { position: relative; perspective: 900px; }

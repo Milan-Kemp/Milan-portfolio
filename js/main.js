@@ -33,7 +33,27 @@ document.addEventListener('DOMContentLoaded', () => {
   setupCardLinks();
   setupOtherItems();
   setupDotNav();
+  setupEmailCopyButtons();
 });
+
+/* Copies the email address instead of relying on mailto: (which does
+   nothing for visitors without a default mail client configured), with a
+   short "Gekopieerd ✓" confirmation. Falls back to mailto: if clipboard
+   access fails for any reason. */
+function setupEmailCopyButtons() {
+  document.querySelectorAll('.footer-email-btn').forEach(btn => {
+    const original = btn.textContent;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.email);
+        btn.textContent = 'Gekopieerd ✓';
+        setTimeout(() => { btn.textContent = original; }, 1800);
+      } catch {
+        window.location.href = `mailto:${btn.dataset.email}`;
+      }
+    });
+  });
+}
 
 /* "Overig werk" cards never change size — only .active (border/color)
    toggles, exactly like .stage.active on the pipeline pages. One shared
