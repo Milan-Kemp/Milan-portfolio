@@ -132,6 +132,10 @@ function setupOtherItems() {
   });
 
   linkEl.addEventListener('click', (e) => e.stopPropagation());
+
+  document.querySelectorAll('.other-video-preview').forEach(el => {
+    el.addEventListener('click', (e) => e.stopPropagation());
+  });
 }
 
 /* Makes .project-card[data-href] navigate on click anywhere in the card

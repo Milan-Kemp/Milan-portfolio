@@ -358,16 +358,14 @@ h1 em {
 .other-item .other-title { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: -0.01em; color: var(--text); }
 .other-item .other-meta { font-family: var(--mono); font-size: 11.5px; color: var(--text-faint); margin-top: 5px; line-height: 1.5; }
 
-.other-video-flag {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.03em;
-  color: var(--accent-text);
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-line);
-  padding: 3px 8px; border-radius: 100px;
-  margin-top: 6px;
+.other-video-preview {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--mono); font-size: 11.5px; color: var(--accent-text);
+  text-decoration: none; margin-top: 8px;
 }
-.other-video-flag svg { width: 11px; height: 11px; }
+.other-video-preview:hover, .other-video-preview:focus-visible {
+  text-decoration: underline;
+}
 
 .other-link {
   display: inline-block; margin-top: 6px;
