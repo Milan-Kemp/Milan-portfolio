@@ -38,53 +38,153 @@ document.addEventListener('DOMContentLoaded', () => {
 /* Accordion group across all .other-item cards: opening one closes
    whichever other card was open (same single-open pattern the pipeline
    stages use). Per-card row height (.other-item-body's grid-template-rows)
-   now switches instantly, with no transition of its own — animating that
-   independently per card was the bug: card A's row and card B's row live
-   in different grid rows that reflow independently, so the two height
-   changes drift out of sync and the page height dips and springs back
-   instead of moving on one curve. flipGridHeight()
-   below animates the .other-grid CONTAINER's overall height instead
-   (classic FLIP: measure before, mutate the DOM, measure after, lock the
-   box at the old height, force a reflow, then transition to the new
-   height) so there is exactly one height animation for the whole
-   section, not two competing ones. The JS Spring still drives each
-   card's inner content fade (blur/scale/opacity) and chevron rotation —
-   unrelated to layout height, so it runs independently underneath. */
+   switches instantly, with no transition of its own.
+
+   flipAll() below is the classic FLIP pattern (First/Last/Invert/Play)
+   applied to the WHOLE grid at once, not just the container:
+     - .other-grid's own height (so the page below doesn't jump), and
+     - every .other-item's (top, left), since a card whose own row didn't
+       change size can still be pushed up/down by an EARLIER row growing
+       or shrinking — e.g. closing a row-1 card while opening a row-2
+       card shifts row 2 (and beyond) as a net result of both changes.
+   Measuring/animating each card individually (instead of only the
+   container) is what makes those cards visibly slide to their new spot
+   instead of teleporting there the instant the container's height
+   settles.
+
+   Every getBoundingClientRect() read below happens in one of two clean
+   batches — all "before" reads, then (after the single mutate() write)
+   all "after" reads — never alternated with a write in between. Only
+   ONE reflow is forced for the whole invert step, by reading
+   grid.getBoundingClientRect() once after every card's transform has
+   already been written. Interleaving read-write-read-write per card is
+   exactly what forces a separate synchronous layout on every iteration
+   (layout thrashing) and is why this is deliberately structured as
+   measure-all / mutate / measure-all / write-all / reflow-once instead.
+
+   DURATION is shared by all three animation systems running at once —
+   the container-height transition, every moved card's transform
+   transition, and the content-fade Spring below — so they read as one
+   motion instead of the Spring visibly trailing after the CSS
+   transitions have already settled. FLIP_RESPONSE is tuned so the
+   Spring converges in roughly the same window: a Spring's settle time
+   isn't a simple multiple of its response value (this one's damping is
+   under 1, so it's underdamped and overshoots slightly before
+   settling) — 0.2 was found by simulating Spring._tick() directly with
+   a fixed timestep until value/velocity hold within tolerance, which
+   lands its real settle time around 275ms for FLIP_DURATION's 260ms.
+
+   attachMagneticTilt() also writes this same .other-item's transform on
+   hover/tilt; a FLIP in flight briefly owns that property instead, and
+   normal tilt control returns the moment the FLIP's own transform is
+   cleared at the end. */
+const FLIP_DURATION = 260;
+const FLIP_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const FLIP_RESPONSE = 0.2;
+
 function setupOtherItems() {
   const grid = document.querySelector('.other-grid');
   let activeClose = null;
   let flipGen = 0;
 
-  function flipGridHeight(mutate) {
+  function flipAll(mutate) {
     if (!grid || REDUCED_MOTION) { mutate(); return; }
 
+    const cards = Array.from(grid.querySelectorAll('.other-item'));
+
+    // Pass 1 (read-only): every "before" position, in one batch.
     const startHeight = grid.getBoundingClientRect().height;
+    const firstRects = new Map(cards.map(c => [c, c.getBoundingClientRect()]));
+
+    // Single write batch: the DOM mutation itself.
     mutate();
+
+    // Pass 2 (read-only): every "after" position, in one batch — no
+    // writes happen between this and Pass 1, so this reuses the one
+    // reflow that mutate() invalidated instead of forcing N more.
     const endHeight = grid.getBoundingClientRect().height;
-    if (Math.abs(endHeight - startHeight) < 0.5) return;
+    const lastRects = new Map(cards.map(c => [c, c.getBoundingClientRect()]));
+
+    const heightChanged = Math.abs(endHeight - startHeight) >= 0.5;
+    const moved = [];
+    cards.forEach(card => {
+      const first = firstRects.get(card);
+      const last = lastRects.get(card);
+      const dx = first.left - last.left;
+      const dy = first.top - last.top;
+      if (Math.abs(dx) >= 0.5 || Math.abs(dy) >= 0.5) moved.push({ card, dx, dy });
+    });
+
+    if (!heightChanged && moved.length === 0) return;
 
     const gen = ++flipGen;
-    grid.style.transition = 'none';
-    grid.style.overflow = 'hidden';
-    grid.style.height = `${startHeight}px`;
-    grid.getBoundingClientRect(); // force reflow at the locked start height
+    const TRANSITION = `transform ${FLIP_DURATION}ms ${FLIP_EASE}`;
 
+    // Invert (write-only batch): lock the container at its old height
+    // and every moved card at its old position — same frame as the
+    // mutation, so nothing is visible yet.
+    if (heightChanged) {
+      grid.style.transition = 'none';
+      grid.style.overflow = 'hidden';
+      grid.style.height = `${startHeight}px`;
+    }
+    moved.forEach(({ card, dx, dy }) => {
+      // attachMagneticTilt() writes this same card's transform on every
+      // pointer-driven spring tick, including the down/up bump from the
+      // very click that triggered this flip — suspend it for the
+      // duration so the two don't overwrite each other mid-flight.
+      card._tiltSuspended = true;
+      card.style.transition = 'none';
+      card.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+
+    grid.getBoundingClientRect(); // the ONE forced reflow for this whole step
+
+    // Play: on the next frame, transition everything to its real end state.
     requestAnimationFrame(() => {
       if (gen !== flipGen) return;
       requestAnimationFrame(() => {
         if (gen !== flipGen) return;
-        grid.style.transition = 'height 380ms cubic-bezier(0.16, 1, 0.3, 1)';
-        grid.style.height = `${endHeight}px`;
+        if (heightChanged) {
+          grid.style.transition = `height ${FLIP_DURATION}ms ${FLIP_EASE}`;
+          grid.style.height = `${endHeight}px`;
+        }
+        moved.forEach(({ card }) => {
+          card.style.transition = TRANSITION;
+          card.style.transform = 'translate(0, 0)';
+        });
       });
     });
 
-    grid.addEventListener('transitionend', function onEnd(e) {
-      if (e.target !== grid || e.propertyName !== 'height') return;
-      grid.removeEventListener('transitionend', onEnd);
-      if (gen !== flipGen) return;
-      grid.style.height = 'auto';
-      grid.style.overflow = '';
-      grid.style.transition = '';
+    let pending = (heightChanged ? 1 : 0) + moved.length;
+    function settle() {
+      pending -= 1;
+      if (pending > 0 || gen !== flipGen) return;
+      if (heightChanged) {
+        grid.style.height = 'auto';
+        grid.style.overflow = '';
+        grid.style.transition = '';
+      }
+      moved.forEach(({ card }) => {
+        card.style.transform = '';
+        card.style.transition = '';
+        card._tiltSuspended = false;
+      });
+    }
+
+    if (heightChanged) {
+      grid.addEventListener('transitionend', function onGridEnd(e) {
+        if (e.target !== grid || e.propertyName !== 'height') return;
+        grid.removeEventListener('transitionend', onGridEnd);
+        settle();
+      });
+    }
+    moved.forEach(({ card }) => {
+      card.addEventListener('transitionend', function onCardEnd(e) {
+        if (e.target !== card || e.propertyName !== 'transform') return;
+        card.removeEventListener('transitionend', onCardEnd);
+        settle();
+      });
     });
   }
 
@@ -103,7 +203,7 @@ function setupOtherItems() {
     inner.style.opacity = '0';
 
     const spring = new Spring({
-      value: 0, response: 0.36, damping: 0.86,
+      value: 0, response: FLIP_RESPONSE, damping: 0.86,
       onUpdate: (v) => {
         const o = Math.max(0, Math.min(1, v));
         const scale = 0.965 + 0.035 * o;
@@ -130,7 +230,7 @@ function setupOtherItems() {
 
     function toggle() {
       const isOpen = card.classList.contains('active');
-      flipGridHeight(() => {
+      flipAll(() => {
         if (isOpen) { close(); activeClose = null; return; }
         if (activeClose) activeClose();
         open();
