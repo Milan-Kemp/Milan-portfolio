@@ -75,10 +75,10 @@ function setupOtherItems() {
     { text: "Marketingvideo's en contentproductie voor ReFurnity naast de automation-projecten, inclusief filmwerk en montage.", link: 'https://youtu.be/hMSgtAx6nCA' },
     { text: 'Journalistieke explainer video over hoe vooroordelen ontstaan in AI-systemen door scheve datasets, ontwikkeld voor VPRO Medialab.', link: 'https://youtu.be/aALKHxeAM2g' },
     { text: "Video's voor eigen kanalen, gericht op het oefenen van hooks, pacing en montagetechnieken in een korte-vorm format." },
-    { text: 'Marketingcampagne uitgewerkt op basis van de Pirate Funnel: A/B-tests, doelgroepanalyse en contentstrategie voor een echte opdrachtgever.' },
+    { text: 'Marketingcampagne uitgewerkt op basis van de Pirate Funnel: A/B-tests, doelgroepanalyse en contentstrategie.' },
     { text: "TikTok-video's en posters voor de Impact Fair, content bedacht en gemaakt met AI, gemonteerd in DaVinci Resolve." },
     { text: 'Complete merkidentiteit en social media-strategie voor een fictieve AI-kunstenaar, van visuele stijl tot contentplanning.' },
-    { text: 'Website gebouwd voor een echte opdrachtgever in Wix, van wireframes tot eindproductie, gericht op gebruiksgemak.' },
+    { text: 'Website gebouwd in Wix, van wireframes tot eindproductie, gericht op gebruiksgemak.' },
     { text: 'Chatbot voor eerstelijns juridische hulp bij schulden, gebouwd in Voiceflow voor Schuldenburg. Eerste kennismaking met conversational AI.' }
   ];
 
