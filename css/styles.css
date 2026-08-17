@@ -366,6 +366,7 @@ h1 em {
   background: linear-gradient(155deg, #ffffff, #fbfaf5 75%);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
+  touch-action: manipulation;
   outline: none;
 }
 
