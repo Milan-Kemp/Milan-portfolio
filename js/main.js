@@ -90,17 +90,21 @@ function setupOtherItems() {
     if (title) card.setAttribute('aria-label', `${title.textContent.trim()} — meer info`);
   });
 
+  // No blur here (unlike pipeline.js's own #detail): animating filter:blur()
+  // alongside transform/opacity/max-height on the same element is a known
+  // source of flicker on mobile GPUs, which is also why pipeline.js hides
+  // its #detail entirely on mobile instead of risking it. This panel stays
+  // visible on mobile, so it sticks to opacity/translateY/scale only.
+  let panelTargetHeight = 240;
   const panelSpring = new Spring({
     value: 0, response: 0.36, damping: 0.86,
     onUpdate: (v) => {
       const o = Math.max(0, Math.min(1, v));
       const scale = 0.965 + 0.035 * o;
-      const blur = (1 - o) * 6;
       const translate = (1 - o) * -8;
       detailEl.style.opacity = o;
       detailEl.style.transform = `translateY(${translate}px) scale(${scale})`;
-      detailEl.style.filter = `blur(${blur}px)`;
-      detailEl.style.maxHeight = v <= 0.001 ? '0px' : `${Math.min(v, 1) * 240}px`;
+      detailEl.style.maxHeight = v <= 0.001 ? '0px' : `${Math.min(v, 1) * panelTargetHeight}px`;
       detailEl.style.padding = v <= 0.02 ? '0px 32px' : '30px 32px';
       detailEl.style.pointerEvents = v > 0.5 ? 'auto' : 'none';
     }
@@ -123,6 +127,12 @@ function setupOtherItems() {
       } else {
         linkEl.style.display = 'none';
       }
+      // detailInner has no height constraint of its own (only the outer
+      // panel clips via max-height), so its scrollHeight always reflects
+      // the real content height for the current viewport width — a fixed
+      // pixel cap would either clip longer entries or leave a gap under
+      // shorter ones, especially once text wraps differently on mobile.
+      panelTargetHeight = detailInner.scrollHeight + 60;
       contentSpring.jumpTo(0);
       contentSpring.setTarget(1);
     };

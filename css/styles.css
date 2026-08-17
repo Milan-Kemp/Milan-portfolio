@@ -850,6 +850,12 @@ footer {
   .hero { padding: 90px 0 60px; }
   .project-card { padding: 24px; }
   .project-card-cta { top: 20px; right: 20px; width: 34px; height: 34px; }
+
+  .other-item { padding: 18px 20px; }
+  .other-item .other-title { font-size: 15.5px; }
+  .other-item .other-meta { font-size: 12.5px; line-height: 1.55; }
+  .other-link, .other-video-preview { font-size: 12.5px; }
+  #other-detail-text { font-size: 16px; line-height: 1.65; }
 }
 
 .back-link.is-hover { color: var(--accent-text); }
