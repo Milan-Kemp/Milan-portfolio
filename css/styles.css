@@ -288,6 +288,7 @@ h1 em {
   border-radius: 24px;
   padding: 36px;
   cursor: pointer;
+  touch-action: manipulation;
   will-change: transform;
   transform-style: preserve-3d;
   box-shadow: var(--shadow-sm);
@@ -354,6 +355,20 @@ h1 em {
 }
 
 .project-links a.secondary { color: var(--text-dim); }
+
+.job-alert-screenshot { margin: 18px 0 0; }
+.job-alert-screenshot img {
+  display: block; width: 100%; max-width: 440px;
+  border-radius: 12px; border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.job-alert-screenshot figcaption {
+  font-family: var(--mono); font-size: 11.5px; color: var(--text-faint);
+  margin-top: 8px;
+}
+
+#job-alert-detail-inner .badges { margin-top: 18px; }
+#job-alert-detail-inner .other-link { margin-top: 16px; display: inline-block; }
 
 /* ---------- OTHER WORK (compact) ---------- */
 

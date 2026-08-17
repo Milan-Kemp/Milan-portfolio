@@ -193,7 +193,7 @@
         </div>
       </article>
 
-      <article class="project-card tilt-card observe">
+      <article class="project-card tilt-card observe" id="job-alert-card">
         <div class="project-top">
           <span class="project-num">03</span>
         </div>
@@ -206,18 +206,29 @@
           spec (inclusief edge cases zoals API-limieten en dubbele meldingen), Claude Code
           implementeerde de Python.
         </p>
+      </article>
+    </div>
+
+    <div class="detail" id="job-alert-detail">
+      <div id="job-alert-detail-inner">
+        <p class="detail-text">
+          Draait dagelijks via GitHub Actions: haalt vacatures op via de Adzuna API binnen
+          30km van Purmerend, laat elke vacature scoren door Claude API tegen mijn eigen
+          criteria (relevantie, ervaringsniveau, tools), en mailt de top matches met score en
+          motivatie. Zelf geen match? Dan blijft de mailbox leeg, in plaats van ruis te sturen.
+        </p>
+        <figure class="job-alert-screenshot">
+          <img src="assets/job-alert-email-screenshot.png" alt="Voorbeeld van een dagelijkse match-mail">
+          <figcaption>Voorbeeld van een dagelijkse match-mail</figcaption>
+        </figure>
         <div class="badges">
           <a class="tag-pill" href="https://www.python.org" target="_blank" rel="noopener">Python</a>
           <a class="tag-pill" href="https://www.anthropic.com" target="_blank" rel="noopener">Claude API</a>
           <span class="tag-pill">Adzuna API</span>
           <a class="tag-pill" href="https://docs.github.com/en/actions" target="_blank" rel="noopener">GitHub Actions</a>
         </div>
-        <div class="project-foot">
-          <div class="project-links">
-            <a class="secondary" href="https://github.com/Milan-Kemp/job-alert-bot" target="_blank" rel="noopener">GitHub ↗</a>
-          </div>
-        </div>
-      </article>
+        <a class="other-link" id="job-alert-code-link" href="https://github.com/Milan-Kemp/job-alert-bot" target="_blank" rel="noopener">Bekijk de code ↗</a>
+      </div>
     </div>
   </section>
 

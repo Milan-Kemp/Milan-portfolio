@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupCardLinks();
   setupOtherItems();
+  setupJobAlertCard();
   setupDotNav();
   setupEmailCopyButtons();
 });
@@ -166,6 +167,75 @@ function setupOtherItems() {
   document.querySelectorAll('.other-video-preview').forEach(el => {
     el.addEventListener('click', (e) => e.stopPropagation());
   });
+}
+
+/* Job Alert Automation card: same inline materialize pattern as the shared
+   Overig werk panel (opacity/translateY/scale/max-height, no blur, height
+   measured from the content instead of a fixed cap), just simplified for a
+   single card with static content — no content-crossfade needed since
+   there's nothing to swap between. */
+function setupJobAlertCard() {
+  const card = document.getElementById('job-alert-card');
+  const detailEl = document.getElementById('job-alert-detail');
+  const detailInner = document.getElementById('job-alert-detail-inner');
+  const codeLink = document.getElementById('job-alert-code-link');
+  if (!card || !detailEl || !detailInner) return;
+
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('role', 'button');
+  card.setAttribute('aria-expanded', 'false');
+  const title = card.querySelector('.project-title');
+  if (title) card.setAttribute('aria-label', `${title.textContent.trim()} — meer info`);
+
+  let isOpen = false;
+  let panelTargetHeight = 200;
+  const measureHeight = () => detailInner.scrollHeight + 60;
+
+  const panelSpring = new Spring({
+    value: 0, response: 0.36, damping: 0.86,
+    onUpdate: (v) => {
+      const o = Math.max(0, Math.min(1, v));
+      const scale = 0.965 + 0.035 * o;
+      const translate = (1 - o) * -8;
+      detailEl.style.opacity = o;
+      detailEl.style.transform = `translateY(${translate}px) scale(${scale})`;
+      detailEl.style.maxHeight = v <= 0.001 ? '0px' : `${Math.min(v, 1) * panelTargetHeight}px`;
+      detailEl.style.padding = v <= 0.02 ? '0px 32px' : '30px 32px';
+      detailEl.style.pointerEvents = v > 0.5 ? 'auto' : 'none';
+    }
+  });
+  detailEl.style.maxHeight = '0px';
+  detailEl.style.opacity = '0';
+  detailEl.style.overflow = 'hidden';
+
+  function toggle() {
+    isOpen = !isOpen;
+    card.setAttribute('aria-expanded', String(isOpen));
+    if (isOpen) panelTargetHeight = measureHeight();
+    panelSpring.setTarget(isOpen ? 1 : 0);
+  }
+
+  card.addEventListener('click', toggle);
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); toggle(); }
+  });
+
+  // Re-measures and re-applies max-height directly (bypassing the spring,
+  // which has already settled at this point) whenever the open panel's
+  // natural content height changes for a reason other than the toggle
+  // itself — the screenshot finishing its load, or the viewport resizing
+  // (e.g. a phone rotation) reflowing how the text wraps.
+  function syncOpenHeight() {
+    if (!isOpen) return;
+    panelTargetHeight = measureHeight();
+    detailEl.style.maxHeight = `${panelTargetHeight}px`;
+  }
+
+  const screenshot = detailInner.querySelector('img');
+  if (screenshot) screenshot.addEventListener('load', syncOpenHeight);
+  window.addEventListener('resize', syncOpenHeight);
+
+  if (codeLink) codeLink.addEventListener('click', (e) => e.stopPropagation());
 }
 
 /* Makes .project-card[data-href] navigate on click anywhere in the card
