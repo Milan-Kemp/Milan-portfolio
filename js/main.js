@@ -80,7 +80,7 @@ function setupOtherItems() {
     { text: "TikTok-video's en posters voor de Impact Fair, content bedacht en gemaakt met AI, gemonteerd in DaVinci Resolve." },
     { text: 'Complete merkidentiteit en social media-strategie voor een fictieve AI-kunstenaar, van visuele stijl tot contentplanning.' },
     { text: 'Website gebouwd in Wix, van wireframes tot eindproductie, gericht op gebruiksgemak.' },
-    { text: 'Chatbot voor eerstelijns juridische hulp bij schulden, gebouwd in Voiceflow voor Schuldenburg. Eerste kennismaking met conversational AI.' }
+    { text: 'Chatbot voor eerstelijns juridische hulp bij schulden, gebouwd in Voiceflow voor Schuldenbrug. Eerste kennismaking met conversational AI.' }
   ];
 
   cards.forEach((card, i) => {
