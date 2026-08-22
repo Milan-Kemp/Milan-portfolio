@@ -199,11 +199,11 @@
         </div>
         <h3 class="project-title">Job Alert Automation</h3>
         <p class="project-desc">
-          Gebouwd om mijn eigen sollicitatieproces te automatiseren: een dagelijkse job
-          scanner die vacatures ophaalt via de Adzuna API, ze laat scoren tegen mijn eigen
-          criteria door Claude API, en de top matches mailt. Draait zelfstandig via GitHub
-          Actions, elke ochtend. Ik schreef de architectuur en een gedetailleerde technische
-          spec (inclusief edge cases zoals API-limieten en dubbele meldingen), Claude Code
+          Gebouwd om mijn eigen sollicitatieproces te automatiseren. Een scanner haalt via de
+          Adzuna API dagelijks vacatures op en laat Claude API ze scoren tegen mijn eigen
+          criteria. GitHub Actions draait dit elke ochtend, en de beste matches landen vanzelf
+          in mijn mailbox. Ik schreef de architectuur en een gedetailleerde technische spec,
+          inclusief edge cases zoals API-limieten en dubbele meldingen; Claude Code
           implementeerde de Python.
         </p>
       </article>
@@ -212,10 +212,11 @@
     <div class="detail" id="job-alert-detail">
       <div id="job-alert-detail-inner">
         <p class="detail-text">
-          Draait dagelijks via GitHub Actions: haalt vacatures op via de Adzuna API binnen
-          30km van Purmerend, laat elke vacature scoren door Claude API tegen mijn eigen
-          criteria (relevantie, ervaringsniveau, tools), en mailt de top matches met score en
-          motivatie. Zelf geen match? Dan blijft de mailbox leeg, in plaats van ruis te sturen.
+          Draait volledig zelfstandig, elke ochtend opnieuw: geen handmatig zoeken meer nodig.
+          De zoekradius bestrijkt 60km rond Purmerend, plus remote en hybride functies. Elke
+          vacature krijgt een score en een korte motivatie, zodat duidelijk is waarom iets wel
+          of niet doorkwam. Zelf geen match? Dan blijft de mailbox leeg, in plaats van ruis te
+          sturen.
         </p>
         <figure class="job-alert-screenshot">
           <img src="assets/job-alert-email-screenshot.png" alt="Voorbeeld van een dagelijkse match-mail">
