@@ -356,13 +356,93 @@ h1 em {
 
 .project-links a.secondary { color: var(--text-dim); }
 
-.job-alert-screenshot { margin: 18px 0 0; }
-.job-alert-screenshot img {
-  display: block; width: 100%; max-width: 440px;
-  border-radius: 12px; border: 1px solid var(--border);
+/* Nagebouwde mail-mockup i.p.v. een screenshot — blijft scherp op elke
+   breedte en toont geen echt e-mailadres. max-width houdt 'm bewust klein:
+   dit is een illustratie binnen het detail-paneel, geen hoofdelement. */
+.job-alert-mail {
+  margin: 18px 0 0; max-width: 440px;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
-.job-alert-screenshot figcaption {
+
+.job-alert-mail-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.job-alert-mail-icon {
+  flex-shrink: 0;
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+}
+.job-alert-mail-icon svg { width: 13px; height: 13px; }
+
+.job-alert-mail-from { font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
+.job-alert-mail-subject {
+  font-family: var(--display); font-weight: 600; font-size: 13.5px;
+  color: var(--text); letter-spacing: -0.01em; margin-top: 1px;
+}
+
+.job-alert-mail-body { padding: 16px; }
+
+.job-alert-mail-intro { font-size: 12.5px; color: var(--text-dim); margin-bottom: 12px; }
+
+.job-alert-mail-job {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  background: linear-gradient(155deg, #ffffff, #fbfaf5 75%);
+}
+
+.job-alert-mail-job-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+
+.job-alert-mail-job-title {
+  font-family: var(--display); font-weight: 600; font-size: 14px;
+  color: var(--text); letter-spacing: -0.01em;
+}
+.job-alert-mail-job-company { font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); margin-top: 3px; }
+
+.job-alert-mail-score {
+  flex-shrink: 0;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.02em;
+  color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2));
+  padding: 4px 10px; border-radius: 100px;
+}
+
+.job-alert-mail-motivation { font-size: 12px; line-height: 1.55; color: var(--text-dim); margin: 10px 0; }
+
+.job-alert-mail-signal { margin-top: 8px; }
+.job-alert-mail-signal-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em;
+}
+.job-alert-mail-signal-label::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
+.job-alert-mail-signal-label.is-match { color: var(--accent-text); }
+.job-alert-mail-signal-label.is-match::before { background: var(--accent); }
+.job-alert-mail-signal-label.is-caution { color: #a06a1c; }
+.job-alert-mail-signal-label.is-caution::before { background: var(--accent3); }
+
+.job-alert-mail-signal ul { margin: 4px 0 0 16px; }
+.job-alert-mail-signal li { font-size: 11.5px; line-height: 1.5; color: var(--text-dim); }
+
+.job-alert-mail-link {
+  display: inline-block; margin-top: 12px;
+  font-family: var(--mono); font-size: 11px; color: var(--accent-text);
+}
+
+.job-alert-mail-footnote {
+  font-family: var(--mono); font-size: 10.5px; color: var(--text-faint);
+  line-height: 1.5; margin-top: 10px;
+}
+
+.job-alert-mail figcaption {
   font-family: var(--mono); font-size: 11.5px; color: var(--text-faint);
   margin-top: 8px;
 }

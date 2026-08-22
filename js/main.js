@@ -221,18 +221,16 @@ function setupJobAlertCard() {
   });
 
   // Re-measures and re-applies max-height directly (bypassing the spring,
-  // which has already settled at this point) whenever the open panel's
-  // natural content height changes for a reason other than the toggle
-  // itself — the screenshot finishing its load, or the viewport resizing
-  // (e.g. a phone rotation) reflowing how the text wraps.
+  // which has already settled at this point) if the open panel's natural
+  // content height changes for a reason other than the toggle itself —
+  // the viewport resizing (e.g. a phone rotation) reflowing how the text
+  // wraps.
   function syncOpenHeight() {
     if (!isOpen) return;
     panelTargetHeight = measureHeight();
     detailEl.style.maxHeight = `${panelTargetHeight}px`;
   }
 
-  const screenshot = detailInner.querySelector('img');
-  if (screenshot) screenshot.addEventListener('load', syncOpenHeight);
   window.addEventListener('resize', syncOpenHeight);
 
   if (codeLink) codeLink.addEventListener('click', (e) => e.stopPropagation());

@@ -218,8 +218,54 @@
           of niet doorkwam. Zelf geen match? Dan blijft de mailbox leeg, in plaats van ruis te
           sturen.
         </p>
-        <figure class="job-alert-screenshot">
-          <img src="assets/job-alert-email-screenshot.png" alt="Voorbeeld van een dagelijkse match-mail">
+        <figure class="job-alert-mail">
+          <div class="job-alert-mail-head">
+            <span class="job-alert-mail-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1.5" y="3" width="13" height="10" rx="1.5"/>
+                <path d="M2 4l6 5 6-5"/>
+              </svg>
+            </span>
+            <div class="job-alert-mail-headtext">
+              <div class="job-alert-mail-from">job-alerts@job-alert-bot.app</div>
+              <div class="job-alert-mail-subject">Dagelijkse job alert</div>
+            </div>
+          </div>
+          <div class="job-alert-mail-body">
+            <p class="job-alert-mail-intro">Deze vacature scoorde vandaag het hoogst tegen jouw criteria:</p>
+            <div class="job-alert-mail-job">
+              <div class="job-alert-mail-job-head">
+                <div>
+                  <div class="job-alert-mail-job-title">Automation Specialist (n8n Expert)</div>
+                  <div class="job-alert-mail-job-company">Jobgether — Veldhoven, Noord-Brabant</div>
+                </div>
+                <span class="job-alert-mail-score">9/10</span>
+              </div>
+              <p class="job-alert-mail-motivation">
+                Hands-on automation rol specifiek gericht op n8n, met focus op het verbinden
+                van platforms, APIs, CRMs en AI-services, exact wat ik al gebouwd heb.
+              </p>
+              <div class="job-alert-mail-signal">
+                <span class="job-alert-mail-signal-label is-match">Match</span>
+                <ul>
+                  <li>n8n expert vereist</li>
+                  <li>focus op orchestratie en verbinden van systemen</li>
+                  <li>AI-enabled workflows als kernvereiste</li>
+                </ul>
+              </div>
+              <div class="job-alert-mail-signal">
+                <span class="job-alert-mail-signal-label is-caution">Let op</span>
+                <ul>
+                  <li>geen duidelijke ervaringseis genoemd in excerpt</li>
+                </ul>
+              </div>
+              <span class="job-alert-mail-link">Bekijk vacature →</span>
+            </div>
+            <p class="job-alert-mail-footnote">
+              Score gebaseerd op een beperkte Adzuna-omschrijving (excerpt), niet de
+              volledige vacaturetekst.
+            </p>
+          </div>
           <figcaption>Voorbeeld van een dagelijkse match-mail</figcaption>
         </figure>
         <div class="badges">
