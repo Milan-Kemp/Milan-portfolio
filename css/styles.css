@@ -36,13 +36,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background:
-    radial-gradient(1100px 700px at 12% -8%, rgba(65,194,29,0.14), transparent 60%),
-    radial-gradient(900px 640px at 88% 6%, rgba(45,212,191,0.12), transparent 60%),
-    radial-gradient(800px 560px at 50% 38%, rgba(255,182,72,0.08), transparent 65%),
-    radial-gradient(1000px 700px at 20% 96%, rgba(65,194,29,0.09), transparent 60%),
-    var(--bg);
-  background-attachment: fixed;
+  background: var(--bg);
   color: var(--text);
   font-family: var(--body);
   line-height: 1.5;
@@ -54,11 +48,28 @@ body {
 
 img { max-width: 100%; display: block; }
 
+/* Page-wide ambient gradient. Lives on its own fixed layer instead of
+   `background-attachment: fixed` on body, which forces the browser to
+   repaint the four large gradients on every scroll frame. A fixed element
+   is composited once and just stays put while the page scrolls. */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(1100px 700px at 12% -8%, rgba(65,194,29,0.14), transparent 60%),
+    radial-gradient(900px 640px at 88% 6%, rgba(45,212,191,0.12), transparent 60%),
+    radial-gradient(800px 560px at 50% 38%, rgba(255,182,72,0.08), transparent 65%),
+    radial-gradient(1000px 700px at 20% 96%, rgba(65,194,29,0.09), transparent 60%);
+}
+
 /* ---------- GRAIN OVERLAY ---------- */
 
+/* No mix-blend-mode: a blended full-screen fixed layer makes the browser
+   re-blend everything underneath it on every scroll frame. At this opacity
+   a plain overlay reads the same. */
 .grain {
   position: fixed; inset: 0; z-index: 999; pointer-events: none;
-  opacity: 0.045; mix-blend-mode: overlay;
+  opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -74,7 +85,6 @@ img { max-width: 100%; display: block; }
   transform: translateX(-50%);
   z-index: 0;
   pointer-events: none;
-  filter: blur(64px);
   opacity: 0.82;
   will-change: transform;
 }
@@ -94,10 +104,13 @@ img { max-width: 100%; display: block; }
 }
 
 .mesh div { position: absolute; border-radius: 50%; }
-.mesh .b1 { width: 620px; height: 620px; left: 0; top: 40px; background: radial-gradient(circle, rgba(65,194,29,0.6), transparent 72%); }
-.mesh .b2 { width: 560px; height: 560px; right: 0; top: -10px; background: radial-gradient(circle, rgba(45,212,191,0.52), transparent 72%); }
-.mesh .b3 { width: 480px; height: 480px; left: 40%; top: 280px; background: radial-gradient(circle, rgba(255,182,72,0.42), transparent 72%); }
-.mesh .b4 { width: 380px; height: 380px; left: 0; top: 420px; background: radial-gradient(circle, rgba(45,212,191,0.34), transparent 72%); }
+/* Eased multi-stop falloff stands in for the old blur(64px) on .mesh: same
+   soft edges, but baked into the gradient instead of re-filtered on the GPU
+   every time the mesh moves with scroll. */
+.mesh .b1 { width: 620px; height: 620px; left: 0; top: 40px; background: radial-gradient(circle, rgba(65,194,29,0.64) 0%, rgba(65,194,29,0.42) 24%, rgba(65,194,29,0.18) 48%, transparent 74%); }
+.mesh .b2 { width: 560px; height: 560px; right: 0; top: -10px; background: radial-gradient(circle, rgba(45,212,191,0.56) 0%, rgba(45,212,191,0.36) 24%, rgba(45,212,191,0.15) 48%, transparent 74%); }
+.mesh .b3 { width: 480px; height: 480px; left: 40%; top: 280px; background: radial-gradient(circle, rgba(255,182,72,0.46) 0%, rgba(255,182,72,0.29) 24%, rgba(255,182,72,0.12) 48%, transparent 74%); }
+.mesh .b4 { width: 380px; height: 380px; left: 0; top: 420px; background: radial-gradient(circle, rgba(45,212,191,0.38) 0%, rgba(45,212,191,0.24) 24%, rgba(45,212,191,0.1) 48%, transparent 74%); }
 
 .parallax-host { will-change: transform; }
 
