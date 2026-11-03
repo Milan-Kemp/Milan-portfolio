@@ -460,16 +460,13 @@ h1 em {
   margin-top: 8px;
 }
 
-/* Uitklappanelen zijn standaard dicht via CSS, niet alleen via JS: anders staan
-   ze open (en nemen ze 62px lege ruimte in) zolang de JS nog niet gedraaid
+/* Het uitklappaneel is standaard dicht via CSS, niet alleen via JS: anders staat
+   het open (en neemt het 62px lege ruimte in) zolang de JS nog niet gedraaid
    heeft of faalt. De spring in main.js overschrijft dit met inline waarden. */
-#job-alert-detail, #other-detail {
+#other-detail {
   max-height: 0; opacity: 0; overflow: hidden; pointer-events: none;
   padding-top: 0; padding-bottom: 0;
 }
-
-#job-alert-detail-inner .badges { margin-top: 18px; }
-#job-alert-detail-inner .other-link { margin-top: 16px; display: inline-block; }
 
 /* ---------- OTHER WORK (compact) ---------- */
 
