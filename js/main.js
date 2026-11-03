@@ -3,8 +3,10 @@
    Hero stagger, scroll reveals, magnetic tilt cards, dot navigation.
    ========================================================================== */
 
-/* Certificaten: een nieuw certificaat toevoegen = één object aan deze lijst
-   toevoegen. skills: 2 tot 3 korte labels. url: de verificatielink. */
+/* Licenties & Certificeringen: een nieuw certificaat toevoegen = één object aan
+   deze lijst toevoegen (nieuwste bovenaan). skills: korte labels.
+   Optioneel: url (verificatielink, geeft een "Bekijk certificaat"-knop) en
+   ref (referentienummer). Het getal in de hero komt uit de lengte van deze lijst. */
 const CERTIFICATES = [
   {
     name: 'Introduction to Model Context Protocol',
@@ -12,10 +14,40 @@ const CERTIFICATES = [
     date: 'november 2026',
     skills: ['Model Context Protocol (MCP)', 'AI-integraties', 'Claude'],
     url: 'https://academy.claude.com/verify/df17135f13a67f6ba7a1574b5ba8eaad'
+  },
+  {
+    name: 'Applied AI Foundations',
+    issuer: 'OpenAI',
+    date: 'augustus 2026',
+    skills: ['AI Workflow Automation & Prompt Engineering'],
+    ref: 'j7lau4ax7c'
+  },
+  {
+    name: 'AI Fluency: Framework and Foundations',
+    issuer: 'Anthropic',
+    date: 'juli 2026',
+    skills: ['AI Fluency']
+  },
+  {
+    name: 'De Nationale AI-Cursus',
+    issuer: 'lowercase',
+    date: 'februari 2025',
+    skills: ['Kunstmatige intelligentie'],
+    ref: 'DNAC-53482904'
+  },
+  {
+    name: 'Certified Conversation Designer',
+    issuer: 'Conversational Academy',
+    date: 'oktober 2024',
+    skills: ['Conversation Design'],
+    ref: '205856024CD'
   }
 ];
 
 function renderCertificates() {
+  const countEl = document.getElementById('cert-count');
+  if (countEl) countEl.dataset.countTo = CERTIFICATES.length;
+
   const grid = document.getElementById('certs-grid');
   if (!grid) return;
   const gradients = [['--accent', '--accent2'], ['--accent3', '--accent2'], ['--accent', '--accent3']];
@@ -28,27 +60,30 @@ function renderCertificates() {
 
   CERTIFICATES.forEach((cert, i) => {
     const [from, to] = gradients[i % gradients.length];
-    const badge = make('div', 'license-badge', cert.issuer.charAt(0));
+    const badge = make('div', 'license-badge', cert.issuer.charAt(0).toUpperCase());
     badge.style.background = `linear-gradient(135deg, var(${from}), var(${to}))`;
     badge.setAttribute('aria-hidden', 'true');
 
     const skills = make('div', 'badges cert-skills');
     cert.skills.forEach(skill => skills.append(make('span', 'badge', skill)));
 
-    const link = make('a', 'btn btn-secondary cert-btn', 'Bekijk certificaat');
-    link.href = cert.url;
-    link.target = '_blank';
-    link.rel = 'noopener';
-    link.setAttribute('aria-label', `Bekijk certificaat ${cert.name} (opent in een nieuw tabblad)`);
-
     const body = make('div', 'license-body');
     body.append(
       make('h3', 'license-title', cert.name),
       make('div', 'license-issuer', cert.issuer),
-      make('div', 'license-meta', cert.date),
-      skills,
-      link
+      make('div', 'license-meta', `Behaald: ${cert.date}`)
     );
+    if (cert.ref) body.append(make('div', 'license-ref', `Referentienummer: ${cert.ref}`));
+    body.append(skills);
+
+    if (cert.url) {
+      const link = make('a', 'btn btn-secondary cert-btn', 'Bekijk certificaat');
+      link.href = cert.url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.setAttribute('aria-label', `Bekijk certificaat ${cert.name} (opent in een nieuw tabblad)`);
+      body.append(link);
+    }
 
     const card = make('div', 'license-card cert-card tilt-card');
     card.append(badge, body);

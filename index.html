@@ -47,7 +47,6 @@
   <button class="dot" data-target="other-work" aria-label="Ga naar Overig werk"><span class="dot-tooltip">Overig werk</span></button>
   <button class="dot" data-target="skills" aria-label="Ga naar Skills"><span class="dot-tooltip">Skills</span></button>
   <button class="dot" data-target="licenses" aria-label="Ga naar Licenties &amp; Certificeringen"><span class="dot-tooltip">Licenties</span></button>
-  <button class="dot" data-target="certificates" aria-label="Ga naar Certificaten"><span class="dot-tooltip">Certificaten</span></button>
   <button class="dot" data-target="contact" aria-label="Ga naar Contact"><span class="dot-tooltip">Contact</span></button>
 </nav>
 
@@ -69,7 +68,7 @@
         </div>
         <div class="hero-meta reveal">
           <div class="meta-item"><strong><span class="count" data-count-to="3">0</span> projecten</strong>portfolio-overzicht</div>
-          <div class="meta-item"><strong><span class="count" data-count-to="4">0</span> certificeringen</strong>behaald</div>
+          <div class="meta-item"><strong><span class="count" id="cert-count" data-count-to="5">0</span> certificeringen</strong>behaald</div>
           <div class="meta-item"><strong>Human-in-the-loop</strong>by design</div>
           <div class="meta-item"><strong>Purmerend, NL</strong>locatie</div>
         </div>
@@ -350,64 +349,11 @@
     </div>
   </section>
 
-  <!-- ================= LICENTIES & CERTIFICERINGEN ================= -->
+  <!-- ================= LICENTIES & CERTIFICERINGEN (kaarten komen uit CERTIFICATES in js/main.js) ================= -->
   <section class="section" id="licenses">
     <div class="section-head">
       <div class="section-title observe">Licenties &amp; Certificeringen</div>
       <div class="section-hint observe">Behaalde certificeringen &amp; cursussen</div>
-    </div>
-
-    <div class="licenses-grid">
-      <div class="license-card tilt-card">
-        <div class="license-badge" style="background: linear-gradient(135deg, var(--accent), var(--accent2));">A</div>
-        <div class="license-body">
-          <h3 class="license-title">AI Fluency: Framework and Foundations</h3>
-          <div class="license-issuer">Anthropic</div>
-          <div class="license-meta">Behaald: juli 2026</div>
-          <span class="badge license-skill">AI Fluency</span>
-        </div>
-      </div>
-
-      <div class="license-card tilt-card">
-        <div class="license-badge" style="background: linear-gradient(135deg, var(--accent3), var(--accent2));">A</div>
-        <div class="license-body">
-          <h3 class="license-title">Applied AI Foundations</h3>
-          <div class="license-issuer">OpenAI</div>
-          <div class="license-meta">Behaald: augustus 2026</div>
-          <div class="license-ref">Referentienummer: j7lau4ax7c</div>
-          <span class="badge license-skill">AI Workflow Automation &amp; Prompt Engineering</span>
-        </div>
-      </div>
-
-      <div class="license-card tilt-card">
-        <div class="license-badge" style="background: linear-gradient(135deg, var(--accent2), var(--accent3));">L</div>
-        <div class="license-body">
-          <h3 class="license-title">De Nationale AI-Cursus</h3>
-          <div class="license-issuer">lowercase</div>
-          <div class="license-meta">Behaald: februari 2025</div>
-          <div class="license-ref">Referentienummer: DNAC-53482904</div>
-          <span class="badge license-skill">Kunstmatige intelligentie</span>
-        </div>
-      </div>
-
-      <div class="license-card tilt-card">
-        <div class="license-badge" style="background: linear-gradient(135deg, var(--accent), var(--accent3));">C</div>
-        <div class="license-body">
-          <h3 class="license-title">Certified Conversation Designer</h3>
-          <div class="license-issuer">Conversational Academy</div>
-          <div class="license-meta">Behaald: oktober 2024</div>
-          <div class="license-ref">Referentienummer: 205856024CD</div>
-          <span class="badge license-skill">Conversation Design</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= CERTIFICATEN (kaarten komen uit CERTIFICATES in js/main.js) ================= -->
-  <section class="section" id="certificates">
-    <div class="section-head">
-      <div class="section-title observe">Certificaten</div>
-      <div class="section-hint observe">Verifieerbaar via de uitgever</div>
     </div>
 
     <p class="about-text observe" style="margin-bottom: 28px;">
