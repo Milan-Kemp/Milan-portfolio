@@ -3,7 +3,63 @@
    Hero stagger, scroll reveals, magnetic tilt cards, dot navigation.
    ========================================================================== */
 
+/* Certificaten: een nieuw certificaat toevoegen = één object aan deze lijst
+   toevoegen. skills: 2 tot 3 korte labels. url: de verificatielink. */
+const CERTIFICATES = [
+  {
+    name: 'Introduction to Model Context Protocol',
+    issuer: 'Anthropic',
+    date: 'november 2026',
+    skills: ['Model Context Protocol (MCP)', 'AI-integraties', 'Claude'],
+    url: 'https://academy.claude.com/verify/df17135f13a67f6ba7a1574b5ba8eaad'
+  }
+];
+
+function renderCertificates() {
+  const grid = document.getElementById('certs-grid');
+  if (!grid) return;
+  const gradients = [['--accent', '--accent2'], ['--accent3', '--accent2'], ['--accent', '--accent3']];
+  const make = (tag, cls, text) => {
+    const el = document.createElement(tag);
+    el.className = cls;
+    if (text) el.textContent = text;
+    return el;
+  };
+
+  CERTIFICATES.forEach((cert, i) => {
+    const [from, to] = gradients[i % gradients.length];
+    const badge = make('div', 'license-badge', cert.issuer.charAt(0));
+    badge.style.background = `linear-gradient(135deg, var(${from}), var(${to}))`;
+    badge.setAttribute('aria-hidden', 'true');
+
+    const skills = make('div', 'badges cert-skills');
+    cert.skills.forEach(skill => skills.append(make('span', 'badge', skill)));
+
+    const link = make('a', 'btn btn-secondary cert-btn', 'Bekijk certificaat');
+    link.href = cert.url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.setAttribute('aria-label', `Bekijk certificaat ${cert.name} (opent in een nieuw tabblad)`);
+
+    const body = make('div', 'license-body');
+    body.append(
+      make('h3', 'license-title', cert.name),
+      make('div', 'license-issuer', cert.issuer),
+      make('div', 'license-meta', cert.date),
+      skills,
+      link
+    );
+
+    const card = make('div', 'license-card cert-card tilt-card');
+    card.append(badge, body);
+    grid.append(card);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  // Moet vóór de reveal/tilt-setup hieronder draaien, anders missen de kaarten die.
+  renderCertificates();
+
   revealStagger([...document.querySelectorAll('.hero .reveal')], 80, 70);
   observeReveal('.observe');
   observeStaggerGroup('.other-grid', '.other-item', { stagger: 55 });
