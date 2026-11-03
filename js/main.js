@@ -278,6 +278,7 @@ function setupJobAlertCard() {
   const title = card.querySelector('.project-title');
   if (title) card.setAttribute('aria-label', `${title.textContent.trim()} — meer info`);
 
+  const cta = card.querySelector('.project-card-cta');
   let isOpen = false;
   let panelTargetHeight = 200;
   const measureHeight = () => detailInner.scrollHeight + 60;
@@ -302,6 +303,7 @@ function setupJobAlertCard() {
   function toggle() {
     isOpen = !isOpen;
     card.setAttribute('aria-expanded', String(isOpen));
+    if (cta) cta.textContent = isOpen ? '−' : '+';
     if (isOpen) panelTargetHeight = measureHeight();
     panelSpring.setTarget(isOpen ? 1 : 0);
   }
