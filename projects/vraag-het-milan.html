@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vraag het Milan (RAG-chatbot) Case Study: Milan Kemp</title>
+<meta name="description" content="Case study: een RAG-chatbot die vragen over mijn projecten beantwoordt, uitsluitend op basis van mijn eigen projectteksten, met bronvermelding. Live gehost op AWS en als widget ingebouwd in deze site.">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+<meta property="og:title" content="Vraag het Milan (RAG-chatbot) Case Study: Milan Kemp">
+<meta property="og:description" content="Case study: een RAG-chatbot die vragen over mijn projecten beantwoordt, uitsluitend op basis van mijn eigen projectteksten, met bronvermelding. Live gehost op AWS en als widget ingebouwd in deze site.">
+<meta property="og:image" content="../assets/og-image.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f4f3ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="grain"></div>
+
+<div class="wrap">
+  <div class="mesh"><div class="b1"></div><div class="b2"></div><div class="b3"></div><div class="b4"></div></div>
+
+  <section class="hero">
+    <a class="back-link reveal" href="../index.html">← Terug naar portfolio</a>
+    <span class="eyebrow reveal">Case study: RAG-chatbot</span>
+    <h1 class="reveal">Een chatbot die alleen antwoordt <em>vanuit mijn eigen projectteksten</em>, met bronvermelding</h1>
+    <p class="hero-sub reveal">
+      Een Retrieval-Augmented Generation chatbot die bezoekers vragen laat stellen over mijn
+      projecten, zoals “hoe loste Milan onderwerpherhaling op in de LinkedIn pipeline?”. Het
+      antwoord komt uitsluitend uit mijn eigen case studies, met de bron erbij. Staat een
+      antwoord niet in mijn teksten, dan zegt de bot dat, in plaats van iets te verzinnen.
+      Live gehost op AWS en als widget ingebouwd in deze site.
+    </p>
+    <div class="hero-meta reveal">
+      <div class="meta-item"><strong>6 stappen</strong>van tekst tot widget</div>
+      <div class="meta-item"><strong>Live</strong>AWS EC2, met HTTPS</div>
+      <div class="meta-item"><strong>Stack</strong>FastAPI · ChromaDB · Claude API</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title observe">Hoe het werkt</div>
+      <div class="section-hint observe">Beweeg over een stap, klik voor details</div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-track"></div>
+      <div class="flow-dot"></div>
+      <div class="stages" id="stages"></div>
+    </div>
+
+    <div class="detail" id="detail">
+      <div class="detail-inner" id="detail-inner">
+        <div>
+          <div class="detail-heading" id="detail-heading">Wat er gebeurt</div>
+          <div class="detail-text" id="detail-text"></div>
+        </div>
+        <div>
+          <div class="detail-heading" style="color:var(--text-faint)"><span style="background:var(--text-faint)"></span>Tech</div>
+          <div class="badges" id="detail-badges"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="position:relative;">
+    <div class="mesh" style="top:-60px; opacity:0.45; width:900px; height:420px;"><div class="b2" style="right:auto; left:10%;"></div><div class="b3" style="left:auto; right:10%; top:60px;"></div></div>
+    <div class="section-head"><div class="section-title observe">Waarom en mijn rol</div></div>
+    <div class="lesson observe">
+      <div class="lesson-icon">◆</div>
+      <div>
+        <h3>Waarom dit project</h3>
+        <p>
+          RAG komt steeds terug in de vacatures waar ik naar kijk, en het was een vaardigheid
+          die ik nog niet kon laten zien. Dit project dicht dat gat, en het is meteen een
+          werkend onderdeel van mijn portfolio.
+        </p>
+      </div>
+    </div>
+    <div class="lesson observe" style="margin-top:16px;">
+      <div class="lesson-icon">◆</div>
+      <div>
+        <h3>Mijn rol</h3>
+        <p>
+          Ik bepaalde de architectuur en schreef de specificatie: wat de pipeline moet doen,
+          welke onderdelen erin zitten, wat er niet in hoort (geen cloud-vectorstore, geen
+          fine-tuning) en waar het mis kan gaan. Claude Code implementeerde dat. Ik testte
+          elke stap zelf, stuurde bij op wat ik zag, en nam de uitrol op AWS persoonlijk door.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title observe">Problemen waar ik tegenaan liep</div>
+      <div class="section-hint observe">Bijna elk probleem stond letterlijk in de foutmelding</div>
+    </div>
+    <div class="outputs">
+      <div class="output-card lift-card observe">
+        <span class="tag">01</span><h4>Mijn eigen bestanden werden niet gevonden</h4>
+        <p>Ik had mijn teksten als .txt opgeslagen, maar de pipeline las alleen .md. Twee bestanden waren daarbij nog leeg. Ik paste de ingest aan en liet hem lege bestanden melden in plaats van ze stil over te slaan.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">02</span><h4>Gratis API-limiet</h4>
+        <p>Voyage staat zonder betaalmethode maar 3 aanvragen per minuut toe. Tijdens het testen liep ik daar direct tegenaan. Zo leerde ik het verschil tussen een bug en een limiet herkennen.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">03</span><h4>Verminkte letters in de terminal</h4>
+        <p>Op Windows werden ë en é verminkt. Het zat in de weergave, niet in de data. De fix was UTF-8 afdwingen bij het printen.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">04</span><h4>Docker startte niet</h4>
+        <p>Docker Desktop miste een onderdeel van Windows (WSL). Na installeren en herstarten draaide alles.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">05</span><h4>Voorbeeldtekst als echte key</h4>
+        <p>Op de server stond in mijn .env nog de placeholder-tekst in plaats van mijn echte keys. De fout “API key invalid” leek een Voyage-probleem. Een simpele controle van de lengte van de keys liet zien wat er mis was.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">06</span><h4>Server onbereikbaar ondanks certificaat</h4>
+        <p>Mijn security group in AWS stond alleen poort 22 open, niet 80 en 443. In de logs van de proxy stond letterlijk: “likely firewall problem”. Na het openzetten van die poorten kwam het certificaat er meteen.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">07</span><h4>Een privésleutel in een projectmap</h4>
+        <p>Mijn SSH-sleutel stond even in de projectmap, waar hij per ongeluk op GitHub of in een Docker-image had kunnen belanden. Ik zette hem veilig en liet git en Docker .pem-bestanden negeren.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title observe">Keuzes die ik bewust maakte</div>
+      <div class="section-hint observe">Klein houden, kosten vastleggen</div>
+    </div>
+    <div class="outputs">
+      <div class="output-card lift-card observe">
+        <span class="tag">01</span><h4>Antwoord alleen uit mijn teksten</h4>
+        <p>De grens “dit staat niet in mijn teksten” vind ik de kern van RAG. Een vraag over mijn opleiding, die niet in mijn content staat, beantwoordt de bot dan ook met precies dat, plus wat hij wel kan vertellen.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">02</span><h4>Embedding-cache</h4>
+        <p>Embeddings kosten geld per aanroep. Door ze op te slaan per stukje tekst betaal ik bij een update alleen voor wat veranderd is.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">03</span><h4>Rate limit</h4>
+        <p>Zodra het endpoint publiek werd, voegde ik een limiet toe per bezoeker en een dagelijks maximum voor iedereen samen. Zo ligt mijn maximale Claude-kosten vast, ook als iemand de bot probeert te spammen.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">04</span><h4>Eén kleine server</h4>
+        <p>Docker met Caddy op één AWS t3.micro in Frankfurt, met een vast IP en HTTPS. Geen load balancer of autoscaling: dit is een portfolio-demo, geen productiesysteem. Lokaal gebruikte alles samen ongeveer 130 MB geheugen.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title observe">Wat ik geleerd heb</div>
+    </div>
+    <div class="outputs">
+      <div class="output-card lift-card observe">
+        <span class="tag">01</span><h4>Hoe een RAG-pipeline in elkaar zit</h4>
+        <p>Van chunking en embeddings tot retrieval en een system prompt die het model aan zijn bronnen bindt.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">02</span><h4>Content weegt zwaarder dan code</h4>
+        <p>De kwaliteit van het antwoord hangt af van de kwaliteit en hoeveelheid van mijn eigen teksten, meer dan van de code. Bij te weinig content schiet de bot tekort, en dat is dan een contentprobleem.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">03</span><h4>Uitrollen op AWS</h4>
+        <p>Een app verpakken met Docker en uitrollen: server, firewall, vast IP, domeinnaam en automatisch HTTPS.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">04</span><h4>Logs lezen in plaats van gokken</h4>
+        <p>Bijna elk probleem stond letterlijk in de foutmelding.</p>
+      </div>
+      <div class="output-card lift-card observe">
+        <span class="tag">05</span><h4>Een API veilig publiek maken</h4>
+        <p>Keys buiten git en Docker, een CORS-allowlist en een limiet op gebruik.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-bottom: 40px;">
+    <div class="section-head">
+      <div class="section-title observe">Resultaat</div>
+      <div class="section-hint observe">Live op een vast adres</div>
+    </div>
+    <div class="lesson observe">
+      <div class="lesson-icon">◆</div>
+      <div>
+        <h3>Een chatbot die eerlijk blijft over zijn bronnen</h3>
+        <p>
+          De chatbot draait live op een vast adres, met HTTPS, en staat als widget in mijn
+          portfolio. Hij beantwoordt vragen over mijn projecten met bronvermelding en zegt
+          eerlijk wanneer iets niet in mijn teksten staat.
+        </p>
+      </div>
+    </div>
+    <div class="badges observe" style="margin-top:24px;">
+      <span class="badge">Python 3.13</span>
+      <span class="badge">FastAPI</span>
+      <span class="badge">Uvicorn</span>
+      <span class="badge">ChromaDB</span>
+      <span class="badge">Voyage AI</span>
+      <span class="badge">Claude API</span>
+      <span class="badge">slowapi</span>
+      <span class="badge">Docker</span>
+      <span class="badge">Docker Compose</span>
+      <span class="badge">Caddy</span>
+      <span class="badge">AWS EC2</span>
+      <span class="badge">DuckDNS</span>
+      <span class="badge">JavaScript</span>
+      <span class="badge">GitHub Pages</span>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <div class="footer-name">Milan Kemp</div>
+      <div class="footer-role">Automation &amp; AI development</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="../index.html">← Portfolio</a>
+    </div>
+  </footer>
+
+</div>
+
+<script src="../js/springs.js"></script>
+<script src="../js/pipeline.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  revealStagger([...document.querySelectorAll('.hero .reveal')], 80, 70);
+  observeReveal('.observe');
+  document.querySelectorAll('.footer-link, .back-link').forEach(el => attachPressFeedback(el));
+  document.querySelectorAll('.badge').forEach(el => attachBadgePop(el));
+  document.querySelectorAll('.lift-card').forEach(el => {
+    attachMagneticTilt(el, { maxTilt: 6, lift: -2, hoverScale: 1.02, downScale: 0.985 });
+  });
+
+  const stagesData = [
+    { title: "Inlezen", sub: "Chunking en embeddings", heading: "Teksten klaarmaken",
+      text: "Mijn teksten worden op de kopjes in stukken van ongeveer 400 tokens geknipt, zodat elk stuk over één onderwerp gaat. Voyage AI zet elk stuk om in een embedding, die per stuk wordt opgeslagen: bij een update betaal ik alleen voor wat veranderd is. Lege bestanden worden gemeld in plaats van stil overgeslagen.",
+      badges: ["Python", "Voyage AI", "ChromaDB"] },
+    { title: "Opzoeken", sub: "Vector search", heading: "Het juiste stuk vinden",
+      text: "De vraag van de bezoeker wordt omgezet in een vector en vergeleken met de stukken in een lokale, persistente ChromaDB. De vier meest relevante gaan door.",
+      badges: ["ChromaDB", "Voyage AI"] },
+    { title: "Antwoorden", sub: "Claude API", heading: "Alleen uit mijn teksten",
+      text: "Claude krijgt alleen die vier stukken en de opdracht om daar uitsluitend op te antwoorden en de bron te noemen. Staat het antwoord niet in mijn teksten, dan zegt de bot dat, in plaats van iets te verzinnen.",
+      badges: ["Claude API"] },
+    { title: "Beschermen", sub: "Rate limit en CORS", heading: "Kosten en toegang vastleggen",
+      text: "Zodra het endpoint publiek werd, kwam er een limiet per bezoeker en een dagelijks maximum voor iedereen samen, zodat mijn maximale Claude-kosten vastliggen. Daarnaast een CORS-allowlist, en keys die buiten git en Docker blijven.",
+      badges: ["FastAPI", "slowapi"] },
+    { title: "Uitrollen", sub: "Docker, Caddy, AWS", heading: "Eén kleine server",
+      text: "Docker Compose met Caddy als reverse proxy op één AWS t3.micro in Frankfurt, met een vast IP, een DuckDNS-domein en automatisch HTTPS. Bewust geen load balancer of autoscaling: dit is een portfolio-demo, geen productiesysteem.",
+      badges: ["Docker", "Caddy", "AWS EC2", "DuckDNS"] },
+    { title: "Widget", sub: "Op deze site", heading: "Vragen stellen",
+      text: "Een widget in vanilla JavaScript, zonder dependencies, staat rechtsonder op deze site. Hij stuurt de vraag naar de API, toont een laadindicator en daarna het antwoord met bronvermelding, en meldt het netjes bij te veel vragen.",
+      badges: ["JavaScript", "GitHub Pages"] }
+  ];
+
+  initPipeline(stagesData, { openIndex: 0 });
+});
+</script>
+
+</body>
+</html>
